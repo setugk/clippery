@@ -24,7 +24,7 @@ PAGE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clip</title>
+<title>Clippu</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><text x='16' y='23' text-anchor='middle' font-family='-apple-system,sans-serif' font-weight='600' font-size='19' fill='white'>C</text></svg>">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -331,7 +331,7 @@ textarea::placeholder { color: #C4C4C4; }
 </head>
 <body>
 
-<div class="bar"><span class="bar-title">Clip</span></div>
+<div class="bar"><span class="bar-title">Clippu</span></div>
 
 <div class="main">
   <!-- History (left) -->

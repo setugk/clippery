@@ -1,4 +1,4 @@
-# Clip
+# Clippu
 
 A self-hosted shared clipboard. Share text between devices in seconds — no accounts, no cloud, no friction.
 
