@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Clippery">
@@ -10,7 +10,7 @@
 <link rel="manifest" href="/manifest.json">
 <title>Clippery</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><text x='16' y='23' text-anchor='middle' font-family='-apple-system,sans-serif' font-weight='600' font-size='19' fill='white'>C</text></svg>">
-<link rel="stylesheet" href="/static/style.css?v=10">
+<link rel="stylesheet" href="/static/style.css?v=18">
 </head>
 <body>
 
@@ -40,51 +40,56 @@
 
     <nav class="sidebar-nav" id="sidebar-nav">
 
-      <!-- Top nav: All Notes + Recents -->
-      <div class="sidebar-top-nav">
-        <button class="nav-item nav-all-notes" id="nav-all-notes">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          All Notes
-          <span class="nav-count" id="all-notes-count"></span>
-        </button>
-        <button class="nav-item" id="nav-recents">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Recents
-        </button>
-        <button class="nav-item nav-trash" id="nav-trash">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          Trash
-          <span class="nav-count" id="trash-count"></span>
-        </button>
-      </div>
-
-      <!-- Timeline section -->
-      <div class="sidebar-section" id="timeline-section">
-        <button class="sidebar-section-toggle" id="timeline-toggle">
-          <svg class="section-chev" id="timeline-chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          Timeline
-        </button>
-        <div id="timeline-list"></div>
-      </div>
-
-      <!-- Pinned Tags section -->
+      <!-- Pinned (expandable) -->
       <div class="sidebar-section" id="pinned-tags-section">
-        <button class="sidebar-section-toggle" id="pinned-tags-toggle">
-          <svg class="section-chev" id="pinned-tags-chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <button class="nav-item nav-expandable" id="pinned-tags-toggle">
+          <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
           Pinned
+          <svg class="section-chev" id="pinned-tags-chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <div id="pinned-tags-list"></div>
       </div>
 
-      <!-- All Tags section -->
+      <!-- Recents -->
+      <button class="nav-item" id="nav-recents">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Recents
+      </button>
+
+      <!-- All Notes -->
+      <button class="nav-item nav-all-notes" id="nav-all-notes">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        All Notes
+        <span class="nav-count" id="all-notes-count"></span>
+      </button>
+
+      <!-- Tags (expandable) -->
       <div class="sidebar-section" id="all-tags-section">
-        <button class="sidebar-section-toggle" id="all-tags-toggle">
-          <svg class="section-chev" id="all-tags-chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <button class="nav-item nav-expandable" id="all-tags-toggle">
+          <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
           Tags
-          <span class="section-count" id="all-tags-count"></span>
+          <span class="nav-count" id="all-tags-count"></span>
+          <svg class="section-chev" id="all-tags-chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <div id="all-tags-list"></div>
       </div>
+
+      <!-- Timeline (expandable) -->
+      <div class="sidebar-section" id="timeline-section">
+        <button class="nav-item nav-expandable" id="timeline-toggle">
+          <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Timeline
+          <svg class="section-chev" id="timeline-chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div id="timeline-list"></div>
+      </div>
+
+      <!-- Trash -->
+      <button class="nav-item nav-trash" id="nav-trash">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Trash
+        <span class="nav-count" id="trash-count"></span>
+      </button>
 
       <!-- Folders section (hidden by default) -->
       <div class="sidebar-section" id="folders-section">
@@ -125,7 +130,9 @@
           </div>
         </div>
         <button class="empty-trash-btn hidden" id="empty-trash-btn">Empty Trash</button>
-        <button class="select-btn" id="select-mode-btn">Select</button>
+        <button class="select-btn" id="select-mode-btn" title="Select notes">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </button>
         <button class="select-done-btn" id="select-done-btn">Done</button>
       </div>
     </div>
@@ -209,6 +216,116 @@
 
 </div>
 
+<!-- ── Settings view (full-screen fixed overlay, body-level sibling of .app) ── -->
+<div class="settings-view hidden" id="settings-view" data-pane="list">
+
+    <div class="settings-topbar">
+      <button class="settings-topbar-back hidden" id="settings-topbar-back">
+        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 1 1 7.5 8 14"/></svg>
+        Settings
+      </button>
+      <span class="settings-topbar-title" id="settings-topbar-title">Settings</span>
+      <button class="icon-btn settings-topbar-close" id="settings-topbar-close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="settings-body">
+
+      <!-- Left: category list (sidebar equivalent) -->
+      <div class="settings-cat-pane" id="settings-cat-pane">
+        <nav class="settings-cat-nav">
+          <button class="settings-cat-item active" data-section="general">
+            <span>General</span>
+            <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
+          </button>
+          <button class="settings-cat-item" data-section="sidebar">
+            <span>Sidebar</span>
+            <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
+          </button>
+          <button class="settings-cat-item" data-section="tags">
+            <span>Tags</span>
+            <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
+          </button>
+          <button class="settings-cat-item" data-section="data">
+            <span>Data</span>
+            <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Right: section content (notes-pane equivalent) -->
+      <div class="settings-content-pane" id="settings-content-pane">
+
+        <!-- General panel -->
+        <div class="settings-panel" id="settings-panel-general">
+          <div class="settings-group">
+            <div class="settings-group-title">Appearance</div>
+            <div class="settings-group-rows">
+              <div class="settings-row">
+                <div class="settings-row-label">Dark Mode</div>
+                <button class="toggle-switch" id="settings-dark-toggle"></button>
+              </div>
+            </div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-group-title">Notes List</div>
+            <div class="settings-group-rows">
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">List date</div>
+                  <div class="settings-row-desc">Which date shows on each note</div>
+                </div>
+                <div class="date-display-picker" id="date-display-picker">
+                  <button data-value="created">Created</button>
+                  <button data-value="updated">Last edited</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar panel -->
+        <div class="settings-panel hidden" id="settings-panel-sidebar">
+          <div class="settings-group">
+            <div class="settings-group-title">Navigation</div>
+            <div class="settings-group-rows">
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Show Folders</div>
+                  <div class="settings-row-desc">Display folder tree in the sidebar</div>
+                </div>
+                <button class="toggle-switch" id="settings-folders-toggle"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags panel -->
+        <div class="settings-panel hidden" id="settings-panel-tags">
+          <div class="settings-group">
+            <div class="settings-group-title">All Tags</div>
+            <div id="settings-tags-list"></div>
+          </div>
+        </div>
+
+        <!-- Data panel -->
+        <div class="settings-panel hidden" id="settings-panel-data">
+          <div class="settings-group">
+            <div class="settings-group-title">Export</div>
+            <div class="settings-group-rows">
+              <div class="settings-row">
+                <div class="settings-row-label">Export all notes</div>
+                <a href="/api/export" class="settings-export-link">Download JSON</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 <!-- ── Move to folder modal ── -->
 <div class="modal-overlay hidden" id="move-modal">
   <div class="modal" id="move-modal-content">
@@ -237,116 +354,6 @@
         <button class="btn-secondary" id="folder-cancel-btn">Cancel</button>
         <button class="btn-primary" id="folder-confirm-btn">Create</button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Settings view (full-screen, reuses same two-pane pattern as main app) ── -->
-<div class="settings-view hidden" id="settings-view" data-pane="list">
-
-  <div class="settings-topbar">
-    <button class="settings-topbar-back hidden" id="settings-topbar-back">
-      <svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 1 1 7.5 8 14"/></svg>
-      Settings
-    </button>
-    <span class="settings-topbar-title" id="settings-topbar-title">Settings</span>
-    <button class="icon-btn settings-topbar-close" id="settings-topbar-close">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-
-  <div class="settings-body">
-
-    <!-- Left: category list (sidebar equivalent) -->
-    <div class="settings-cat-pane" id="settings-cat-pane">
-      <nav class="settings-cat-nav">
-        <button class="settings-cat-item active" data-section="general">
-          <span>General</span>
-          <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
-        </button>
-        <button class="settings-cat-item" data-section="sidebar">
-          <span>Sidebar</span>
-          <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
-        </button>
-        <button class="settings-cat-item" data-section="tags">
-          <span>Tags</span>
-          <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
-        </button>
-        <button class="settings-cat-item" data-section="data">
-          <span>Data</span>
-          <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
-        </button>
-      </nav>
-    </div>
-
-    <!-- Right: section content (notes-pane equivalent) -->
-    <div class="settings-content-pane" id="settings-content-pane">
-
-      <!-- General panel -->
-      <div class="settings-panel" id="settings-panel-general">
-        <div class="settings-group">
-          <div class="settings-group-title">Appearance</div>
-          <div class="settings-group-rows">
-            <div class="settings-row">
-              <div class="settings-row-label">Dark Mode</div>
-              <button class="toggle-switch" id="settings-dark-toggle"></button>
-            </div>
-          </div>
-        </div>
-        <div class="settings-group">
-          <div class="settings-group-title">Notes List</div>
-          <div class="settings-group-rows">
-            <div class="settings-row">
-              <div>
-                <div class="settings-row-label">List date</div>
-                <div class="settings-row-desc">Which date shows on each note</div>
-              </div>
-              <div class="date-display-picker" id="date-display-picker">
-                <button data-value="created">Created</button>
-                <button data-value="updated">Last edited</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sidebar panel -->
-      <div class="settings-panel hidden" id="settings-panel-sidebar">
-        <div class="settings-group">
-          <div class="settings-group-title">Navigation</div>
-          <div class="settings-group-rows">
-            <div class="settings-row">
-              <div>
-                <div class="settings-row-label">Show Folders</div>
-                <div class="settings-row-desc">Display folder tree in the sidebar</div>
-              </div>
-              <button class="toggle-switch" id="settings-folders-toggle"></button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tags panel -->
-      <div class="settings-panel hidden" id="settings-panel-tags">
-        <div class="settings-group">
-          <div class="settings-group-title">All Tags</div>
-          <div id="settings-tags-list"></div>
-        </div>
-      </div>
-
-      <!-- Data panel -->
-      <div class="settings-panel hidden" id="settings-panel-data">
-        <div class="settings-group">
-          <div class="settings-group-title">Export</div>
-          <div class="settings-group-rows">
-            <div class="settings-row">
-              <div class="settings-row-label">Export all notes</div>
-              <a href="/api/export" class="settings-export-link">Download JSON</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 </div>
@@ -383,6 +390,6 @@
 
 <div class="toast hidden" id="toast"></div>
 
-<script src="/static/app.js?v=11"></script>
+<script src="/static/app.js?v=17"></script>
 </body>
 </html>

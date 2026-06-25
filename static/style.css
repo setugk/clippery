@@ -46,6 +46,7 @@ body {
   min-height: -webkit-fill-available;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
+  touch-action: pan-x pan-y; /* allow scroll/swipe, block double-tap & pinch zoom */
 }
 
 /* ── App shell ─────────────────────────────────────────────────────── */
@@ -107,24 +108,28 @@ body {
 .sidebar-nav::-webkit-scrollbar { width: 3px; }
 .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* ── Sidebar top nav (All Notes + Recents) ──────────────────────────── */
-
-.sidebar-top-nav { margin-bottom: 4px; }
+/* ── Sidebar nav items (Pinned, Recents, All Notes, Tags, Timeline, Trash) ─── */
 
 .nav-item {
+  position: relative;
   display: flex; align-items: center; gap: 8px;
-  width: calc(100% - 12px); padding: 6px 10px 6px 14px;
+  /* right padding reserves a fixed column for the chevron, so counts always
+     right-align to the same x whether or not a chevron is present */
+  width: calc(100% - 12px); padding: 6px 30px 6px 14px;
   background: none; border: none;
   font-size: 13px; font-family: inherit; color: var(--text-2);
   cursor: pointer; text-align: left;
   border-radius: 7px; margin: 1px 6px;
   transition: background 0.08s, color 0.08s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
 }
 .nav-item:hover { background: var(--border); color: var(--text); }
 .nav-item.active { background: var(--border-mid); color: var(--text); font-weight: 600; }
-.nav-item svg { flex-shrink: 0; color: var(--text-muted); }
-.nav-item.active svg { color: var(--text); }
+.nav-item .nav-icon { flex-shrink: 0; color: var(--text-muted); width: 14px; }
+.nav-item.active .nav-icon { color: var(--text); }
 
+/* Count right-aligns to the reserved column edge — consistent across all rows */
 .nav-count {
   margin-left: auto;
   font-size: 11px; color: var(--text-faint); font-weight: 400;
@@ -132,39 +137,32 @@ body {
 
 /* ── Sidebar collapsible sections ───────────────────────────────────── */
 
-.sidebar-section {
-  border-top: 1px solid var(--divider);
-  padding-top: 2px;
-  margin-top: 4px;
-}
+.sidebar-section { /* no divider — sections flow as one unified list */ }
 
-.sidebar-section-toggle {
-  display: flex; align-items: center; gap: 7px;
-  width: 100%; padding: 8px 14px 6px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--text-faint);
-  background: none; border: none; cursor: pointer;
-  font-family: inherit; text-align: left;
-  transition: color 0.1s;
+/* Chevron sits in the reserved right column, absolutely positioned so it never
+   shifts the count. */
+.nav-item.nav-expandable .section-chev {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  flex-shrink: 0; color: var(--text-faint);
+  transition: transform 0.15s;
 }
-.sidebar-section-toggle:hover { color: var(--text-muted); }
+/* More specific than the base .nav-item.nav-expandable .section-chev rule above,
+   so the rotation actually wins when the section is expanded. */
+.nav-item.nav-expandable .section-chev.open { transform: translateY(-50%) rotate(90deg); }
+
+/* Folders gets a light divider since it's a different category */
+#folders-section {
+  border-top: 1px solid var(--divider);
+  margin-top: 6px;
+  padding-top: 6px;
+}
 
 /* Non-interactive section label (Folders) */
 .sidebar-section-label {
-  padding: 8px 14px 6px;
+  padding: 6px 14px 6px;
   font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--text-faint);
-}
-
-.section-chev {
-  transition: transform 0.15s;
-  flex-shrink: 0;
-}
-.section-chev.open { transform: rotate(90deg); }
-
-.section-count {
-  margin-left: auto;
-  font-size: 11px; font-weight: 400; color: var(--text-faint);
 }
 
 /* ── Timeline year items ─────────────────────────────────────────────── */
@@ -172,11 +170,13 @@ body {
 .year-nav-item {
   display: flex; align-items: center;
   width: calc(100% - 12px); margin: 1px 6px;
-  padding: 5px 8px 5px 20px;
+  padding: 5px 30px 5px 14px;
   background: none; border: none; border-radius: 7px;
   font-size: 13px; font-family: inherit; color: var(--text-2);
   cursor: pointer; text-align: left;
   transition: background 0.08s, color 0.08s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
 }
 .year-nav-item:hover { background: var(--border); color: var(--text); }
 .year-nav-item.active { background: var(--border-mid); color: var(--text); font-weight: 600; }
@@ -190,16 +190,19 @@ body {
 .tag-nav-item {
   display: flex; align-items: center; gap: 7px;
   width: calc(100% - 12px); margin: 1px 6px;
-  padding: 5px 6px 5px 14px;
+  padding: 5px 30px 5px 14px;
   background: none; border: none; border-radius: 7px;
   font-size: 13px; font-family: inherit; color: var(--text-2);
   cursor: pointer; text-align: left;
   transition: background 0.08s, color 0.08s;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
 }
 .tag-nav-item:hover { background: var(--border); color: var(--text); }
 .tag-nav-item.active { background: var(--border-mid); color: var(--text); font-weight: 600; }
 .tag-hash { color: var(--text-faint); font-size: 12px; }
+/* count right-aligns to the same reserved column as the section counts */
 .tag-right { margin-left: auto; display: flex; align-items: center; gap: 3px; }
 .tag-count { font-size: 11px; color: var(--text-faint); }
 
@@ -216,9 +219,15 @@ body {
 .tag-pin-btn:hover { color: var(--text); background: var(--border-mid); }
 .tag-pin-btn.pinned { opacity: 1; color: var(--text-muted); }
 
+/* Pinned tags: pin sits to the LEFT of the hashtag (a tappable unpin target,
+   away from the row's open-tag tap area) */
+.tag-pin-btn.tag-pin-left {
+  width: 18px; height: 18px; margin-left: -2px; opacity: 1;
+}
+
 /* Pinned tags section empty state */
 .sidebar-empty {
-  padding: 4px 14px 8px;
+  padding: 4px 14px 8px 14px;
   font-size: 11px; color: var(--text-faint); font-style: italic;
 }
 
@@ -702,10 +711,14 @@ body {
 
 /* ── Settings view ─────────────────────────────────────────────────────── */
 
+/* Full-screen overlay. Body-level element with no transformed ancestors, so
+   position:fixed resolves to the viewport — works identically on desktop and
+   iOS Safari, independent of the sliding-pane layout underneath. */
 .settings-view {
-  position: fixed; inset: 0; z-index: 500;
-  background: var(--bg);
+  position: fixed; inset: 0; z-index: 1000;
   display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 .settings-view.hidden { display: none; }
@@ -999,14 +1012,12 @@ body {
   .sidebar-search { padding: 12px 14px 10px; gap: 10px; }
   .sidebar-search input { font-size: 16px; }
 
-  .nav-item     { min-height: 48px; font-size: 16px; padding: 0 14px 0 16px; gap: 10px; }
+  .nav-item     { min-height: 48px; font-size: 16px; padding: 0 36px 0 16px; gap: 10px; }
   .folder-row   { min-height: 48px; }
   .folder-btn   { padding: 12px 4px; font-size: 16px; gap: 10px; }
-  .tag-nav-item { min-height: 48px; font-size: 16px; padding: 8px 6px 8px 16px; }
-  .year-nav-item { min-height: 48px; font-size: 16px; padding: 8px 14px 8px 20px; }
+  .tag-nav-item { min-height: 48px; font-size: 16px; padding: 8px 36px 8px 16px; }
+  .year-nav-item { min-height: 48px; font-size: 16px; padding: 8px 36px 8px 16px; }
   .tag-pin-btn  { opacity: 1; width: 32px; height: 32px; }
-
-  .sidebar-section-toggle { min-height: 44px; padding: 12px 16px 6px; font-size: 11px; }
 
   .note-item { padding: 14px 18px; }
   .note-item-title { font-size: 15px; }
@@ -1068,10 +1079,18 @@ body {
   .settings-cat-item.active { background: var(--surface); color: var(--text); font-weight: 400; }
   .settings-cat-chev { display: block; }
 
-  /* One pane visible at a time — same as main app data-view pattern */
-  .settings-view[data-pane="list"] .settings-content-pane { display: none; }
-  .settings-view[data-pane="detail"] .settings-cat-pane { display: none; }
-  .settings-view[data-pane="detail"] .settings-content-pane { padding: 20px 16px 40px; }
+  /* Sliding drill-down — same pattern as the main app's three panes */
+  .settings-body { position: relative; overflow: hidden; }
+  .settings-cat-pane,
+  .settings-content-pane {
+    position: absolute; inset: 0;
+    overflow-y: auto;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .settings-view[data-pane="list"]   .settings-cat-pane     { transform: translateX(0); }
+  .settings-view[data-pane="list"]   .settings-content-pane { transform: translateX(100%); }
+  .settings-view[data-pane="detail"] .settings-cat-pane     { transform: translateX(-100%); }
+  .settings-view[data-pane="detail"] .settings-content-pane { transform: translateX(0); padding: 20px 16px 40px; }
 
   .settings-row { min-height: 48px; }
   .settings-row-label { font-size: 16px; }
@@ -1083,13 +1102,13 @@ body {
 /* ── Multi-select ─────────────────────────────────────────────────────── */
 
 .select-btn {
-  padding: 4px 8px;
-  font-size: 12px; font-weight: 500; font-family: inherit;
+  width: 30px; height: 30px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
   color: var(--text-muted); background: none; border: none;
-  border-radius: 6px; cursor: pointer; transition: color 0.1s;
-  white-space: nowrap;
+  border-radius: 7px; cursor: pointer;
+  transition: background 0.1s, color 0.1s;
 }
-.select-btn:hover { color: var(--text); }
+.select-btn:hover { background: var(--border); color: var(--text); }
 
 .select-done-btn {
   display: none;

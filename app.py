@@ -181,6 +181,20 @@ def rename_tag(tag_name):
 
 # ── Export ────────────────────────────────────────────────────────────────────
 
+@app.route("/api/import", methods=["POST"])
+@requires_auth
+def import_backup():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or "notes" not in data:
+        return jsonify({"error": "invalid backup payload"}), 400
+    mode = request.args.get("mode", "merge")
+    try:
+        result = db.import_data(data, mode=mode)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    return jsonify(result)
+
+
 @app.route("/api/export")
 @requires_auth
 def export_data():

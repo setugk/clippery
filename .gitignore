@@ -6,3 +6,6 @@ From other apps/
 Notion Export/
 *.enex
 .DS_Store
+
+# Private content dumps from one-time migrations — never commit (real journal data)
+notion_*.json

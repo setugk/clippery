@@ -145,6 +145,27 @@ function openSettings() {
 $("settings-topbar-back").addEventListener("click", settingsBackToList);
 $("settings-topbar-close").addEventListener("click", closeSettings);
 
+// Swipe from the left edge to go back from a settings section to the list
+let settingsSwipeX = 0, settingsSwipeY = 0, settingsSwipeActive = false;
+$("settings-view").addEventListener("touchstart", e => {
+  settingsSwipeX = e.touches[0].clientX;
+  settingsSwipeY = e.touches[0].clientY;
+  settingsSwipeActive = settingsSwipeX < 32 && $("settings-view").dataset.pane === "detail";
+}, { passive: true });
+$("settings-view").addEventListener("touchend", e => {
+  if (!settingsSwipeActive) return;
+  settingsSwipeActive = false;
+  const dx = e.changedTouches[0].clientX - settingsSwipeX;
+  const dy = Math.abs(e.changedTouches[0].clientY - settingsSwipeY);
+  if (dx > 60 && dy < 80) settingsBackToList();
+}, { passive: true });
+
+// Block pinch-to-zoom on iOS Safari (gesture events) — touch-action handles the rest.
+// Does not affect text selection (gesture events are pinch/rotate only).
+["gesturestart", "gesturechange", "gestureend"].forEach(evt =>
+  document.addEventListener(evt, e => e.preventDefault(), { passive: false })
+);
+
 $("date-display-picker").addEventListener("click", e => {
   const btn = e.target.closest("[data-value]");
   if (!btn) return;
@@ -267,8 +288,8 @@ $("settings-folders-toggle").addEventListener("click", () => {
 
 // ── Sidebar rendering ─────────────────────────────────────────────────────────
 
-const PIN_SVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
-const PIN_OUTLINE_SVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
+const PIN_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>`;
+const PIN_OUTLINE_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>`;
 
 function pinTag(tagName) {
   if (state.pinnedTags.includes(tagName)) return;
@@ -316,7 +337,7 @@ function renderPinnedTags() {
     const isActive = state.context.type === "tag" && state.context.id === name;
     const btn = document.createElement("button");
     btn.className = "tag-nav-item" + (isActive ? " active" : "");
-    btn.innerHTML = `<span class="tag-hash">#</span>${esc(name)}<span class="tag-right"><button class="tag-pin-btn pinned" title="Unpin">${PIN_SVG}</button><span class="tag-count">${tag.count}</span></span>`;
+    btn.innerHTML = `<button class="tag-pin-btn pinned tag-pin-left" title="Unpin">${PIN_SVG}</button><span class="tag-hash">#</span>${esc(name)}<span class="tag-right"><span class="tag-count">${tag.count}</span></span>`;
     btn.addEventListener("click", () => navigateToTag(name));
     btn.querySelector(".tag-pin-btn").addEventListener("click", e => {
       e.stopPropagation();

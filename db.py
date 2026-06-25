@@ -203,7 +203,8 @@ def create_note(title="", body="", folder_id=None, created_at=None, tags=None):
             "folder_id": folder_id, "created_at": created_at or ts, "updated_at": ts}
     with conn:
         conn.execute(
-            "INSERT INTO notes VALUES (:id,:title,:body,:folder_id,:created_at,:updated_at)",
+            "INSERT INTO notes (id,title,body,folder_id,created_at,updated_at)"
+            " VALUES (:id,:title,:body,:folder_id,:created_at,:updated_at)",
             note
         )
         if tags:
@@ -366,6 +367,79 @@ def export_all():
         notes.append(n)
     conn.close()
     return {"schema_version": _SCHEMA_VERSION, "folders": folders, "notes": notes}
+
+
+# ── Import / restore ────────────────────────────────────────────────────────────
+
+def import_data(data, mode="merge"):
+    """Restore folders + notes (+ tags) from an export payload.
+
+    mode="merge"   — add folders/notes whose id isn't already present. Never deletes.
+    mode="replace" — WIPE folders/notes/tags/note_tags, then rebuild from the backup
+                     (full disaster recovery).
+
+    Returns counts. Raises ValueError on a malformed payload.
+    """
+    if mode not in ("merge", "replace"):
+        raise ValueError("mode must be 'merge' or 'replace'")
+    folders = data.get("folders")
+    notes = data.get("notes")
+    if not isinstance(folders, list) or not isinstance(notes, list):
+        raise ValueError("invalid backup: 'folders' and 'notes' must be lists")
+    if mode == "replace" and len(notes) == 0:
+        raise ValueError("refusing to replace with an empty backup (0 notes)")
+
+    conn = get_conn()
+    # Bulk import: trust the backup's internal references and skip FK enforcement
+    # so folder→parent and note→folder ordering can't trip us up. Must be set
+    # before any transaction starts.
+    conn.execute("PRAGMA foreign_keys = OFF")
+    folders_in = notes_in = 0
+    try:
+        with conn:
+            if mode == "replace":
+                conn.execute("DELETE FROM note_tags")
+                conn.execute("DELETE FROM tags")
+                conn.execute("DELETE FROM notes")
+                conn.execute("DELETE FROM folders")
+
+            existing_folders = {r["id"] for r in conn.execute("SELECT id FROM folders").fetchall()}
+            for f in folders:
+                if not f.get("id") or (mode == "merge" and f["id"] in existing_folders):
+                    continue
+                conn.execute(
+                    "INSERT OR REPLACE INTO folders (id,name,parent_id,created_at,updated_at)"
+                    " VALUES (?,?,?,?,?)",
+                    (f["id"], f.get("name", ""), f.get("parent_id"),
+                     f.get("created_at") or now(), f.get("updated_at") or now())
+                )
+                folders_in += 1
+
+            existing_notes = {r["id"] for r in conn.execute("SELECT id FROM notes").fetchall()}
+            tag_ids = {r["name"]: r["id"] for r in conn.execute("SELECT name,id FROM tags").fetchall()}
+            for n in notes:
+                if not n.get("id") or (mode == "merge" and n["id"] in existing_notes):
+                    continue
+                conn.execute(
+                    "INSERT OR REPLACE INTO notes (id,title,body,folder_id,created_at,updated_at,deleted_at)"
+                    " VALUES (?,?,?,?,?,?,?)",
+                    (n["id"], n.get("title", ""), n.get("body", ""), n.get("folder_id"),
+                     n.get("created_at") or now(), n.get("updated_at") or now(), n.get("deleted_at"))
+                )
+                notes_in += 1
+                for tag_name in (n.get("tags") or []):
+                    tag_name = (tag_name or "").strip().lower()
+                    if not tag_name:
+                        continue
+                    tid = tag_ids.get(tag_name)
+                    if not tid:
+                        tid = new_id()
+                        conn.execute("INSERT INTO tags VALUES (?,?)", (tid, tag_name))
+                        tag_ids[tag_name] = tid
+                    conn.execute("INSERT OR IGNORE INTO note_tags VALUES (?,?)", (n["id"], tid))
+    finally:
+        conn.close()
+    return {"mode": mode, "folders_imported": folders_in, "notes_imported": notes_in}
 
 
 # ── Sync ──────────────────────────────────────────────────────────────────────
