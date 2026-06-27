@@ -471,6 +471,28 @@ body {
 .overflow-menu button.danger:hover { background: var(--danger-bg); }
 .overflow-menu.hidden { display: none; }
 
+.note-ctx-menu {
+  position: fixed;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  min-width: 160px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  z-index: 200;
+}
+.note-ctx-menu button {
+  display: block; width: 100%;
+  padding: 7px 10px; text-align: left;
+  background: none; border: none; border-radius: 6px;
+  font-size: 13px; font-family: inherit; color: var(--text);
+  cursor: pointer; transition: background 0.08s;
+}
+.note-ctx-menu button:hover { background: var(--surface-2); }
+.note-ctx-menu button.danger { color: var(--danger); }
+.note-ctx-menu button.danger:hover { background: var(--danger-bg); }
+.note-ctx-menu.hidden { display: none; }
+
 .editor-body {
   flex: 1; display: flex; flex-direction: column;
   overflow-y: auto; min-height: 0;
@@ -926,6 +948,58 @@ body {
   transition: background 0.1s; white-space: nowrap; flex-shrink: 0;
 }
 .settings-export-link:hover { background: var(--border); }
+
+/* ── Theme picker ────────────────────────────────────────────────────── */
+
+.theme-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px 8px;
+}
+.theme-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 8px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: background 0.08s;
+  min-height: 44px;
+}
+.theme-card:hover { background: var(--surface-2); }
+.theme-card.active {
+  background: var(--surface-2);
+  border-color: var(--accent);
+}
+.theme-swatch {
+  display: flex;
+  border-radius: 5px;
+  overflow: hidden;
+  width: 44px;
+  height: 28px;
+  flex-shrink: 0;
+  border: 1px solid rgba(128,128,128,0.2);
+}
+.theme-swatch span { flex: 1; display: block; }
+.theme-card-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.theme-card-check {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.theme-card.active .theme-card-check { display: flex; }
+.theme-card-check svg { display: block; }
 
 /* ── Subfolder section toggle (notes pane) ──────────────────────────── */
 

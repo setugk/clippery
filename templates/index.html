@@ -10,7 +10,7 @@
 <link rel="manifest" href="/manifest.json">
 <title>Kathe</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><text x='16' y='23' text-anchor='middle' font-family='-apple-system,sans-serif' font-weight='600' font-size='19' fill='white'>K</text></svg>">
-<link rel="stylesheet" href="/static/style.css?v=23">
+<link rel="stylesheet" href="/static/style.css?v=24">
 </head>
 <body>
 
@@ -250,6 +250,10 @@
             <span>Tags</span>
             <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
           </button>
+          <button class="settings-cat-item" data-section="themes">
+            <span>Themes</span>
+            <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
+          </button>
           <button class="settings-cat-item" data-section="data">
             <span>Data</span>
             <svg class="settings-cat-chev" width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 6 6 1 11"/></svg>
@@ -309,6 +313,29 @@
           <div class="settings-group">
             <div class="settings-group-title">All Tags</div>
             <div id="settings-tags-list"></div>
+          </div>
+        </div>
+
+        <!-- Themes panel -->
+        <div class="settings-panel hidden" id="settings-panel-themes">
+          <div class="settings-group">
+            <div class="settings-group-title">Built-in</div>
+            <div class="theme-grid" id="theme-grid"></div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-group-title">Custom</div>
+            <div class="settings-group-rows">
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Import theme</div>
+                  <div class="settings-row-desc">Load a .json theme file</div>
+                </div>
+                <label class="settings-export-link" style="cursor:pointer">
+                  Load JSON
+                  <input type="file" accept=".json" id="theme-import-input" style="display:none">
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -393,6 +420,13 @@
 
 <div class="toast hidden" id="toast"></div>
 
-<script src="/static/app.js?v=19"></script>
+<!-- ── Note right-click context menu ── -->
+<div class="note-ctx-menu hidden" id="note-ctx-menu">
+  <button id="ctx-copy-btn">Copy to clipboard</button>
+  <button id="ctx-move-btn">Move to folder…</button>
+  <button id="ctx-delete-btn" class="danger">Delete note</button>
+</div>
+
+<script src="/static/app.js?v=21"></script>
 </body>
 </html>

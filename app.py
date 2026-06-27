@@ -210,6 +210,21 @@ def export_data():
 
 # ── Sync polling ──────────────────────────────────────────────────────────────
 
+@app.route("/api/settings/<key>", methods=["GET"])
+@requires_auth
+def get_setting(key):
+    value = db.get_setting(key)
+    return jsonify({"value": value})
+
+
+@app.route("/api/settings/<key>", methods=["PUT"])
+@requires_auth
+def set_setting(key):
+    data = request.get_json(force=True)
+    db.set_setting(key, data.get("value", ""))
+    return jsonify({"ok": True})
+
+
 @app.route("/api/sync")
 @requires_auth
 def sync():

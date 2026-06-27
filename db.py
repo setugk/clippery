@@ -67,6 +67,15 @@ def init_db():
             conn.execute("ALTER TABLE notes ADD COLUMN deleted_at TEXT DEFAULT NULL")
             conn.execute("UPDATE schema_version SET version = 2")
 
+        if current < 3:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                )
+            """)
+            conn.execute("UPDATE schema_version SET version = 3")
+
     conn.close()
     purge_old_trash()
 
@@ -440,6 +449,26 @@ def import_data(data, mode="merge"):
     finally:
         conn.close()
     return {"mode": mode, "folders_imported": folders_in, "notes_imported": notes_in}
+
+
+# ── Settings ──────────────────────────────────────────────────────────────────
+
+def get_setting(key, default=None):
+    conn = get_conn()
+    row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+    conn.close()
+    return row["value"] if row else default
+
+
+def set_setting(key, value):
+    conn = get_conn()
+    with conn:
+        conn.execute(
+            "INSERT INTO settings (key, value) VALUES (?, ?)"
+            " ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            (key, value)
+        )
+    conn.close()
 
 
 # ── Sync ──────────────────────────────────────────────────────────────────────

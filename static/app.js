@@ -59,6 +59,7 @@ const bulkCountEl    = $("bulk-count");
 
 let editingTag = null;
 let movingFolderNode = null;
+let contextMenuNote = null;
 
 // ── API helpers ───────────────────────────────────────────────────────────────
 
@@ -83,6 +84,122 @@ function applyDark(dark) {
   state.darkMode = dark;
 }
 
+// ── Theme system ──────────────────────────────────────────────────────────────
+
+const BUILT_IN_THEMES = [
+  {
+    id: "default-light", name: "Default Light", dark: false,
+    tokens: { "--bg":"#F5F5F5","--surface":"#FFFFFF","--surface-2":"#FAFAFA","--border":"#E5E5E5","--border-mid":"#D4D4D4","--divider":"#F0F0F0","--text":"#111111","--text-2":"#444444","--text-muted":"#737373","--text-faint":"#B0B0B0","--accent":"#111111","--accent-fg":"#FFFFFF","--danger":"#DC2626","--danger-bg":"#FFF1F2" },
+  },
+  {
+    id: "default-dark", name: "Default Dark", dark: true,
+    tokens: { "--bg":"#1E2126","--surface":"#24272E","--surface-2":"#20232A","--border":"#30353E","--border-mid":"#3B414C","--divider":"#2A2E36","--text":"#B6C2D6","--text-2":"#909BAF","--text-muted":"#69727F","--text-faint":"#515863","--accent":"#C8CED8","--accent-fg":"#1E2126","--danger":"#F08C84","--danger-bg":"#2E2125" },
+  },
+  {
+    id: "nord", name: "Nord", dark: true,
+    tokens: { "--bg":"#242933","--surface":"#2E3440","--surface-2":"#272C38","--border":"#3B4252","--border-mid":"#434C5E","--divider":"#2B3040","--text":"#ECEFF4","--text-2":"#D8DEE9","--text-muted":"#8E98AC","--text-faint":"#5E6779","--accent":"#88C0D0","--accent-fg":"#2E3440","--danger":"#BF616A","--danger-bg":"#2D1E22" },
+  },
+  {
+    id: "solarized-dark", name: "Solarized Dark", dark: true,
+    tokens: { "--bg":"#002B36","--surface":"#073642","--surface-2":"#003845","--border":"#124F5E","--border-mid":"#17606F","--divider":"#054554","--text":"#839496","--text-2":"#657B83","--text-muted":"#586E75","--text-faint":"#435B62","--accent":"#2AA198","--accent-fg":"#002B36","--danger":"#DC322F","--danger-bg":"#1A0E00" },
+  },
+  {
+    id: "solarized-light", name: "Solarized Light", dark: false,
+    tokens: { "--bg":"#FDF6E3","--surface":"#EEE8D5","--surface-2":"#E9E2CF","--border":"#D3CBBA","--border-mid":"#C3BFAF","--divider":"#EDE7D2","--text":"#657B83","--text-2":"#839496","--text-muted":"#93A1A1","--text-faint":"#B3BFBF","--accent":"#268BD2","--accent-fg":"#FDF6E3","--danger":"#DC322F","--danger-bg":"#FCE7E6" },
+  },
+  {
+    id: "monokai", name: "Monokai", dark: true,
+    tokens: { "--bg":"#1E1F1C","--surface":"#272822","--surface-2":"#22231F","--border":"#3B3C35","--border-mid":"#464741","--divider":"#2D2E29","--text":"#F8F8F2","--text-2":"#CFCFC2","--text-muted":"#90908A","--text-faint":"#5C5C56","--accent":"#A6E22E","--accent-fg":"#272822","--danger":"#F92672","--danger-bg":"#2D1020" },
+  },
+  {
+    id: "gruvbox-dark", name: "Gruvbox Dark", dark: true,
+    tokens: { "--bg":"#1D2021","--surface":"#282828","--surface-2":"#242424","--border":"#3C3836","--border-mid":"#504945","--divider":"#32302F","--text":"#EBDBB2","--text-2":"#D5C4A1","--text-muted":"#928374","--text-faint":"#665C54","--accent":"#B8BB26","--accent-fg":"#282828","--danger":"#FB4934","--danger-bg":"#2D1010" },
+  },
+  {
+    id: "catppuccin-mocha", name: "Catppuccin Mocha", dark: true,
+    tokens: { "--bg":"#11111B","--surface":"#1E1E2E","--surface-2":"#181825","--border":"#313244","--border-mid":"#45475A","--divider":"#1E1E35","--text":"#CDD6F4","--text-2":"#BAC2DE","--text-muted":"#7F849C","--text-faint":"#585B70","--accent":"#89B4FA","--accent-fg":"#1E1E2E","--danger":"#F38BA8","--danger-bg":"#2D1A22" },
+  },
+];
+
+let activeTheme = null;  // null = default (dark mode toggle controls appearance)
+
+function applyTheme(theme) {
+  activeTheme = theme;
+  let styleEl = document.getElementById("theme-style");
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = "theme-style";
+    document.head.appendChild(styleEl);
+  }
+  if (!theme) {
+    styleEl.textContent = "";
+    return;
+  }
+  // Override all tokens. The injected style tag loads after the linked stylesheet
+  // so same-specificity rules here win via cascade order.
+  const decls = Object.entries(theme.tokens).map(([k, v]) => `${k}:${v}`).join(";");
+  styleEl.textContent = `:root,html[data-dark]{${decls}}`;
+  applyDark(theme.dark);
+}
+
+function themePreviewHTML(theme) {
+  const t = theme.tokens;
+  return `
+    <div class="theme-swatch">
+      <span style="background:${t["--surface-2"]}"></span>
+      <span style="background:${t["--surface"]}"></span>
+      <span style="background:${t["--accent"]}"></span>
+      <span style="background:${t["--bg"]}"></span>
+    </div>
+    <span class="theme-card-name">${esc(theme.name)}</span>
+    <span class="theme-card-check">
+      <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="${t["--accent-fg"]}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
+    </span>`;
+}
+
+function renderThemeGrid() {
+  const grid = $("theme-grid");
+  if (!grid) return;
+  const allThemes = [...BUILT_IN_THEMES, ...(window._customThemes || [])];
+  grid.innerHTML = "";
+  allThemes.forEach(theme => {
+    const card = document.createElement("div");
+    card.className = "theme-card" + (activeTheme && activeTheme.id === theme.id ? " active" : "");
+    card.innerHTML = themePreviewHTML(theme);
+    card.addEventListener("click", async () => {
+      applyTheme(theme);
+      localStorage.setItem("activeTheme", JSON.stringify(theme));
+      await api("PUT", "/api/settings/activeTheme", { value: JSON.stringify(theme) });
+      renderThemeGrid();
+    });
+    grid.appendChild(card);
+  });
+}
+
+$("theme-import-input").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = "";
+  try {
+    const text = await file.text();
+    const theme = JSON.parse(text);
+    if (!theme.name || !theme.tokens || typeof theme.tokens !== "object") throw new Error("Invalid format");
+    if (!theme.id) theme.id = "custom-" + theme.name.toLowerCase().replace(/\s+/g, "-");
+    theme.dark = !!theme.dark;
+    if (!window._customThemes) window._customThemes = [];
+    const idx = window._customThemes.findIndex(t => t.id === theme.id);
+    if (idx !== -1) window._customThemes[idx] = theme;
+    else window._customThemes.push(theme);
+    applyTheme(theme);
+    localStorage.setItem("activeTheme", JSON.stringify(theme));
+    await api("PUT", "/api/settings/activeTheme", { value: JSON.stringify(theme) });
+    renderThemeGrid();
+    showToast(`Theme "${theme.name}" applied`);
+  } catch {
+    showToast("Invalid theme file");
+  }
+});
+
 // ── Toast ─────────────────────────────────────────────────────────────────────
 
 let toastTimer;
@@ -103,7 +220,7 @@ function updateDatePicker() {
 }
 
 const SETTINGS_SECTION_LABELS = {
-  general: "General", sidebar: "Sidebar", tags: "Tags", data: "Data",
+  general: "General", sidebar: "Sidebar", tags: "Tags", themes: "Themes", data: "Data",
 };
 
 function openSettingsSection(section) {
@@ -114,6 +231,7 @@ function openSettingsSection(section) {
     panel.classList.toggle("hidden", panel.id !== `settings-panel-${section}`);
   });
   if (section === "tags") renderSettingsTags();
+  if (section === "themes") renderThemeGrid();
   if (isMobile()) {
     $("settings-view").dataset.pane = "detail";
     $("settings-topbar-back").classList.remove("hidden");
@@ -200,7 +318,7 @@ async function doRenameTag(oldName) {
     const pinIdx = state.pinnedTags.indexOf(oldName);
     if (pinIdx !== -1) {
       state.pinnedTags[pinIdx] = newName;
-      localStorage.setItem("pinnedTags", JSON.stringify(state.pinnedTags));
+      await savePinnedTags();
     }
     state.tags = await api("GET", "/api/tags");
     renderSidebar();
@@ -264,7 +382,7 @@ function renderSettingsTags() {
       await api("DELETE", `/api/tags/${encodeURIComponent(tagName)}`);
       // Remove from pinned if pinned
       state.pinnedTags = state.pinnedTags.filter(t => t !== tagName);
-      localStorage.setItem("pinnedTags", JSON.stringify(state.pinnedTags));
+      await savePinnedTags();
       state.tags = await api("GET", "/api/tags");
       renderSidebar();
       renderSettingsTags();
@@ -291,17 +409,22 @@ $("settings-folders-toggle").addEventListener("click", () => {
 const PIN_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>`;
 const PIN_OUTLINE_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>`;
 
-function pinTag(tagName) {
+async function savePinnedTags() {
+  localStorage.setItem("pinnedTags", JSON.stringify(state.pinnedTags));
+  await api("PUT", "/api/settings/pinnedTags", { value: JSON.stringify(state.pinnedTags) });
+}
+
+async function pinTag(tagName) {
   if (state.pinnedTags.includes(tagName)) return;
   if (state.pinnedTags.length >= 5) { showToast("Max 5 pinned tags"); return; }
   state.pinnedTags.push(tagName);
-  localStorage.setItem("pinnedTags", JSON.stringify(state.pinnedTags));
+  await savePinnedTags();
   renderSidebar();
 }
 
-function unpinTag(tagName) {
+async function unpinTag(tagName) {
   state.pinnedTags = state.pinnedTags.filter(t => t !== tagName);
-  localStorage.setItem("pinnedTags", JSON.stringify(state.pinnedTags));
+  await savePinnedTags();
   renderSidebar();
 }
 
@@ -707,12 +830,31 @@ $("nav-trash").addEventListener("click", navigateToTrash);
 // ── Load data ─────────────────────────────────────────────────────────────────
 
 async function loadAll() {
-  const [folders, tags, all, trash] = await Promise.all([
+  const [folders, tags, all, trash, pinnedTagsSetting, themeSetting] = await Promise.all([
     api("GET", "/api/folders"),
     api("GET", "/api/tags"),
     api("GET", "/api/notes"),
     api("GET", "/api/trash"),
+    api("GET", "/api/settings/pinnedTags"),
+    api("GET", "/api/settings/activeTheme"),
   ]);
+  if (pinnedTagsSetting.value != null) {
+    state.pinnedTags = JSON.parse(pinnedTagsSetting.value);
+    localStorage.setItem("pinnedTags", JSON.stringify(state.pinnedTags));
+  } else if (state.pinnedTags.length) {
+    // Server has no record yet — bootstrap from this device's localStorage
+    await savePinnedTags();
+  }
+  if (themeSetting.value) {
+    try {
+      const theme = JSON.parse(themeSetting.value);
+      applyTheme(theme);
+      localStorage.setItem("activeTheme", JSON.stringify(theme));
+    } catch {}
+  } else {
+    const local = localStorage.getItem("activeTheme");
+    if (local) { try { applyTheme(JSON.parse(local)); } catch {} }
+  }
   state.folders = folders;
   state.tags = tags;
   allNotesCount.textContent = all.length || "";
@@ -978,6 +1120,11 @@ function renderNotesList() {
   });
 
   notesList.querySelectorAll(".note-item").forEach(el => {
+    el.addEventListener("contextmenu", e => {
+      e.preventDefault();
+      const n = state.notes.find(n => n.id === el.dataset.noteId);
+      if (n) showNoteCtxMenu(n, e.clientX, e.clientY);
+    });
     el.addEventListener("click", () => {
       const n = state.notes.find(n => n.id === el.dataset.noteId);
       if (!n) return;
@@ -1658,11 +1805,12 @@ function openMoveModal() {
   $("move-modal-title").textContent = "Move to folder";
   list.innerHTML = "";
 
-  const rootBtn = makeMoveFolderOption(null, "No folder (root)", !state.selectMode && state.note?.folder_id === null);
+  const moveTarget = contextMenuNote || state.note;
+  const rootBtn = makeMoveFolderOption(null, "No folder (root)", !state.selectMode && moveTarget?.folder_id === null);
   list.appendChild(rootBtn);
 
   function addFolder(node, depth = 0) {
-    const isCurrent = !state.selectMode && state.note?.folder_id === node.id;
+    const isCurrent = !state.selectMode && moveTarget?.folder_id === node.id;
     const btn = makeMoveFolderOption(node.id, node.name, isCurrent, depth);
     list.appendChild(btn);
     node.children.forEach(child => addFolder(child, depth + 1));
@@ -1716,9 +1864,11 @@ function makeMoveFolderOption(folderId, name, isCurrent, depth = 0) {
       } else if (state.selectMode) {
         await bulkMove(folderId);
       } else {
-        if (!state.note) return;
-        const updated = await api("PUT", `/api/notes/${state.note.id}`, { folder_id: folderId });
-        state.note = updated;
+        const targetNote = contextMenuNote || state.note;
+        contextMenuNote = null;
+        if (!targetNote) return;
+        const updated = await api("PUT", `/api/notes/${targetNote.id}`, { folder_id: folderId });
+        if (state.note && state.note.id === updated.id) state.note = updated;
         state.notes = state.notes.filter(n => n.id !== updated.id);
         renderNotesList();
         const destName = folderId ? (state.folders.find(f => f.id === folderId)?.name || "folder") : "root";
@@ -1729,9 +1879,83 @@ function makeMoveFolderOption(folderId, name, isCurrent, depth = 0) {
   return btn;
 }
 
-$("move-modal-close").addEventListener("click", () => { movingFolderNode = null; $("move-modal").classList.add("hidden"); });
+$("move-modal-close").addEventListener("click", () => { movingFolderNode = null; contextMenuNote = null; $("move-modal").classList.add("hidden"); });
 $("move-modal").addEventListener("click", e => {
-  if (e.target === $("move-modal")) { movingFolderNode = null; $("move-modal").classList.add("hidden"); }
+  if (e.target === $("move-modal")) { movingFolderNode = null; contextMenuNote = null; $("move-modal").classList.add("hidden"); }
+});
+
+// ── Note context menu (right-click) ───────────────────────────────────────────
+
+const noteCtxMenu = $("note-ctx-menu");
+
+function showNoteCtxMenu(note, x, y) {
+  contextMenuNote = note;
+  noteCtxMenu.style.left = x + "px";
+  noteCtxMenu.style.top  = y + "px";
+  noteCtxMenu.classList.remove("hidden");
+
+  // Clamp to viewport after paint so we know the menu's size
+  requestAnimationFrame(() => {
+    const rect = noteCtxMenu.getBoundingClientRect();
+    if (rect.right  > window.innerWidth)  noteCtxMenu.style.left = (window.innerWidth  - rect.width  - 8) + "px";
+    if (rect.bottom > window.innerHeight) noteCtxMenu.style.top  = (window.innerHeight - rect.height - 8) + "px";
+  });
+}
+
+function hideNoteCtxMenu() {
+  noteCtxMenu.classList.add("hidden");
+  contextMenuNote = null;
+}
+
+document.addEventListener("click", hideNoteCtxMenu);
+document.addEventListener("keydown", e => { if (e.key === "Escape") hideNoteCtxMenu(); });
+noteCtxMenu.addEventListener("click", e => e.stopPropagation());
+
+$("ctx-copy-btn").addEventListener("click", () => {
+  const n = contextMenuNote;
+  hideNoteCtxMenu();
+  if (!n) return;
+  const text = [n.title?.trim(), (n.body || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()]
+    .filter(Boolean).join("\n\n");
+  navigator.clipboard.writeText(text)
+    .then(() => showToast("Copied to clipboard"))
+    .catch(() => showToast("Copy failed"));
+});
+
+$("ctx-move-btn").addEventListener("click", () => {
+  const n = contextMenuNote;
+  noteCtxMenu.classList.add("hidden");
+  // contextMenuNote stays set so openMoveModal picks it up
+  if (!n) return;
+  openMoveModal();
+});
+
+$("ctx-delete-btn").addEventListener("click", async () => {
+  const n = contextMenuNote;
+  hideNoteCtxMenu();
+  if (!n) return;
+  if (!confirm(`Move "${n.title || "Untitled"}" to Trash?`)) return;
+  await api("DELETE", `/api/notes/${n.id}`);
+  state.notes = state.notes.filter(x => x.id !== n.id);
+  if (state.note && state.note.id === n.id) {
+    state.note = null;
+    state.dirty = false;
+    clearTimeout(saveTimer);
+    showEditorEmpty();
+    setMobileView("notes");
+  }
+  renderNotesList();
+  state.tags = await api("GET", "/api/tags");
+  state.trashCount++;
+  $("trash-count").textContent = state.trashCount || "";
+  renderSidebar();
+  const all = await api("GET", "/api/notes");
+  allNotesCount.textContent = all.length || "";
+  const yearCounts = {};
+  all.forEach(x => { const y = new Date(x.created_at).getFullYear(); yearCounts[y] = (yearCounts[y] || 0) + 1; });
+  state.noteYears = Object.entries(yearCounts).sort((a,b) => b[0]-a[0]).map(([year,count]) => ({ year: parseInt(year), count }));
+  renderTimeline();
+  showToast("Moved to Trash");
 });
 
 // ── Overflow menu ─────────────────────────────────────────────────────────────
