@@ -12,6 +12,7 @@ CLIPPERY_USER   = os.environ.get("CLIPPERY_USER")
 CLIPPERY_PASS   = os.environ.get("CLIPPERY_PASS")
 JOURNERY_NAME   = os.environ.get("JOURNERY_NAME", "")
 STATIC_VERSION  = str(int(time.time()))
+APP_VERSION     = "1.7.1"
 
 
 def requires_auth(f):
@@ -31,7 +32,7 @@ def requires_auth(f):
 @app.route("/")
 @requires_auth
 def index():
-    return render_template("index.html", journery_name=JOURNERY_NAME, static_v=STATIC_VERSION)
+    return render_template("index.html", journery_name=JOURNERY_NAME, static_v=STATIC_VERSION, app_version=APP_VERSION)
 
 
 # ── Folders ───────────────────────────────────────────────────────────────────
