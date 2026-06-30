@@ -14,14 +14,12 @@
 </head>
 <body>
 
-{% if journery_name == "Beta" %}<div class="beta-banner">BETA</div>{% endif %}
-
 <div class="app" id="app">
 
   <!-- ── Sidebar ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <span class="app-title">Journery{% if journery_name %} | {{ journery_name }}{% endif %}</span>
+      <span class="app-title">Journery{% if journery_name and journery_name != "Beta" %} | {{ journery_name }}{% endif %}{% if journery_name == "Beta" %}<span class="beta-badge">BETA</span>{% endif %}</span>
       <div class="sidebar-header-actions">
         <button class="icon-btn" id="compose-btn" title="New note">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
