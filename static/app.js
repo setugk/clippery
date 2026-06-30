@@ -1450,6 +1450,40 @@ noteBody.addEventListener("keydown", e => {
     return;
   }
 
+  if (e.key === "Enter") {
+    const sel = window.getSelection();
+    if (sel && sel.isCollapsed && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      let block = range.startContainer;
+      if (block.nodeType === Node.TEXT_NODE) block = block.parentNode;
+      while (block !== noteBody && block.parentNode !== noteBody) block = block.parentNode;
+      const lineText = (block === noteBody
+        ? (range.startContainer.textContent || '')
+        : (block.textContent || '')).trim();
+      if (lineText === '---') {
+        e.preventDefault();
+        const hr   = document.createElement('hr');
+        const next = document.createElement('div');
+        next.appendChild(document.createElement('br'));
+        if (block === noteBody) {
+          noteBody.innerHTML = '';
+          noteBody.appendChild(hr);
+          noteBody.appendChild(next);
+        } else {
+          block.replaceWith(hr);
+          hr.insertAdjacentElement('afterend', next);
+        }
+        const newRange = document.createRange();
+        newRange.setStart(next, 0);
+        newRange.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(newRange);
+        scheduleSave();
+        return;
+      }
+    }
+  }
+
   if (e.metaKey || e.ctrlKey) {
     const k = e.key.toLowerCase();
     if (!e.shiftKey) {
@@ -1458,6 +1492,7 @@ noteBody.addEventListener("keydown", e => {
       if (k === "u") { e.preventDefault(); applyFormat("underline"); return; }
     }
     if (e.shiftKey && k === "s") { e.preventDefault(); applyFormat("strike"); return; }
+    if (e.shiftKey && k === "c") { e.preventDefault(); applyFormat("code"); return; }
   }
 
   if ((e.metaKey || e.ctrlKey) && e.key === "s") {
@@ -1515,6 +1550,23 @@ document.addEventListener("selectionchange", () => {
 
 function applyFormat(fmt) {
   noteBody.focus();
+  if (fmt === 'code') {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    const ancestor = range.commonAncestorContainer;
+    const codeEl = (ancestor.nodeType === Node.TEXT_NODE ? ancestor.parentElement : ancestor)?.closest?.('code');
+    if (codeEl) {
+      const text = document.createTextNode(codeEl.textContent);
+      codeEl.replaceWith(text);
+    } else {
+      const text = sel.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      document.execCommand('insertHTML', false, `<code>${text}</code>`);
+    }
+    scheduleSave();
+    requestAnimationFrame(showFormatBar);
+    return;
+  }
   const execCmds = {
     bold:      'bold',
     italic:    'italic',

@@ -19,7 +19,7 @@ def requires_auth(f):
             if not auth or auth.username != CLIPPERY_USER or auth.password != CLIPPERY_PASS:
                 return Response(
                     "Authentication required.", 401,
-                    {"WWW-Authenticate": 'Basic realm="Kathe"'}
+                    {"WWW-Authenticate": 'Basic realm="Journery"'}
                 )
         return f(*args, **kwargs)
     return decorated
@@ -201,7 +201,7 @@ def import_backup():
 def export_data():
     data = db.export_all()
     data["exported_at"] = db.now()
-    filename = f"kathe-{data['exported_at'][:10]}.json"
+    filename = f"journery-{data['exported_at'][:10]}.json"
     return Response(
         json.dumps(data, indent=2, ensure_ascii=False),
         mimetype="application/json",
@@ -235,8 +235,8 @@ def sync():
 @app.route("/manifest.json")
 def manifest():
     return jsonify({
-        "name": "Kathe",
-        "short_name": "Kathe",
+        "name": "Journery",
+        "short_name": "Journery",
         "start_url": "/",
         "display": "standalone",
         "background_color": "#ffffff",

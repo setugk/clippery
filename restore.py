@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-restore.py — restore Clippery from a backup file.
+restore.py — restore Journery from a backup file.
 
 Usage:
   python3 restore.py BACKUP_FILE [--replace] [--api URL] [--key KEYFILE]
 
 BACKUP_FILE may be:
-  - a plaintext .json export (from GET /api/export or ~/.clippery/backups/), or
-  - an encrypted .json.enc (from backup_clippery_mac.sh). It is decrypted with
-    openssl using the key file (default ~/.clippery/backup.key).
+  - a plaintext .json export (from GET /api/export or ~/.journery/backups/), or
+  - an encrypted .json.enc (from backup_journery_mac.sh). It is decrypted with
+    openssl using the key file (default ~/.journery/backup.key).
 
 Modes:
   default (merge)  Adds folders/notes from the backup whose id isn't already
@@ -19,10 +19,10 @@ Modes:
 
 Examples:
   # Dry-safe merge from the latest local backup:
-  python3 restore.py ~/.clippery/backups/clippery-2026-06-24.json
+  python3 restore.py ~/.journery/backups/journery-2026-06-24.json
 
   # Full restore from the encrypted iCloud copy:
-  python3 restore.py "~/Library/Mobile Documents/com~apple~CloudDocs/ClipperyBackups/clippery-2026-06-24.json.enc" --replace
+  python3 restore.py "~/Library/Mobile Documents/com~apple~CloudDocs/JourneryBackups/journery-2026-06-24.json.enc" --replace
 """
 import argparse
 import json
@@ -33,7 +33,7 @@ import tempfile
 import urllib.request
 
 DEFAULT_API = "http://10.0.0.10:5050/api"
-DEFAULT_KEY = os.path.expanduser("~/.clippery/backup.key")
+DEFAULT_KEY = os.path.expanduser("~/.journery/backup.key")
 
 
 def decrypt(enc_path, key_path):
@@ -54,7 +54,7 @@ def decrypt(enc_path, key_path):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Restore Clippery from a backup file.")
+    ap = argparse.ArgumentParser(description="Restore Journery from a backup file.")
     ap.add_argument("backup", help="path to a .json or .json.enc backup")
     ap.add_argument("--replace", action="store_true",
                     help="wipe current data and rebuild from the backup (disaster recovery)")
