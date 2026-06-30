@@ -146,9 +146,7 @@ body {
   user-select: none; -webkit-user-select: none;
 }
 .nav-item:hover { background: var(--border); color: var(--text); }
-.nav-item.active { background: var(--border-mid); color: var(--text); font-weight: 600; }
 .nav-item .nav-icon { flex-shrink: 0; color: var(--text-muted); width: 14px; }
-.nav-item.active .nav-icon { color: var(--text); }
 
 /* Count right-aligns to the reserved column edge — consistent across all rows */
 .nav-count {
@@ -200,7 +198,6 @@ body {
   user-select: none; -webkit-user-select: none;
 }
 .year-nav-item:hover { background: var(--border); color: var(--text); }
-.year-nav-item.active { background: var(--border-mid); color: var(--text); font-weight: 600; }
 .year-note-count {
   margin-left: auto;
   font-size: 11px; color: var(--text-faint);
@@ -221,7 +218,6 @@ body {
   user-select: none; -webkit-user-select: none;
 }
 .tag-nav-item:hover { background: var(--border); color: var(--text); }
-.tag-nav-item.active { background: var(--border-mid); color: var(--text); font-weight: 600; }
 .tag-hash { color: var(--text-faint); font-size: 12px; }
 /* count right-aligns to the same reserved column as the section counts */
 .tag-right { margin-left: auto; display: flex; align-items: center; gap: 3px; }
@@ -262,7 +258,6 @@ body {
 }
 .folder-row:hover { background: var(--border); }
 .folder-row:hover .folder-kebab { opacity: 1; }
-.folder-row.active { background: var(--border-mid); }
 
 .folder-toggle {
   width: 20px; height: 28px; flex-shrink: 0;
@@ -281,9 +276,7 @@ body {
   font-size: 13px; font-family: inherit; color: var(--text-2);
   text-align: left; overflow: hidden;
 }
-.folder-row.active .folder-btn { color: var(--text); font-weight: 600; }
 .folder-btn svg { flex-shrink: 0; color: var(--text-muted); }
-.folder-row.active .folder-btn svg { color: var(--text); }
 .folder-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 
 .folder-kebab {
@@ -1153,12 +1146,6 @@ body {
 
   .floating-format-bar { display: none !important; }
 
-  .nav-item.active,
-  .folder-row.active,
-  .tag-nav-item.active { background: none; }
-  .nav-item.active     { color: var(--text); font-weight: 600; }
-  .tag-nav-item.active { color: var(--text); font-weight: 600; }
-  .folder-row.active .folder-btn { color: var(--text); font-weight: 600; }
 
   /* Settings view — mobile overrides (drill-down like notes navigation) */
   .settings-topbar {
@@ -1433,9 +1420,6 @@ body {
   .icon-btn     { width: 40px; height: 40px; }
   .bulk-action-btn { min-height: 44px; padding: 0 14px; }
 
-  .nav-item.active     { background: var(--border-mid); }
-  .folder-row.active   { background: var(--border-mid); }
-  .tag-nav-item.active { background: var(--border-mid); }
 
   .floating-format-bar { display: none !important; }
 }
