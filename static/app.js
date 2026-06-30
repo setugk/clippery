@@ -120,6 +120,90 @@ const BUILT_IN_THEMES = [
     id: "catppuccin-mocha", name: "Catppuccin Mocha", dark: true,
     tokens: { "--bg":"#11111B","--surface":"#1E1E2E","--surface-2":"#181825","--border":"#313244","--border-mid":"#45475A","--divider":"#1E1E35","--text":"#CDD6F4","--text-2":"#BAC2DE","--text-muted":"#7F849C","--text-faint":"#585B70","--accent":"#89B4FA","--accent-fg":"#1E1E2E","--danger":"#F38BA8","--danger-bg":"#2D1A22" },
   },
+  {
+    id: "catppuccin-macchiato", name: "Catppuccin Macchiato", dark: true,
+    tokens: { "--bg":"#181926","--surface":"#24273A","--surface-2":"#1E2030","--border":"#363A4F","--border-mid":"#494D64","--divider":"#1E2132","--text":"#CAD3F5","--text-2":"#B8C0E0","--text-muted":"#6E738D","--text-faint":"#5B6078","--accent":"#8AADF4","--accent-fg":"#24273A","--danger":"#ED8796","--danger-bg":"#2D1A22" },
+  },
+  {
+    id: "catppuccin-frappe", name: "Catppuccin Frappé", dark: true,
+    tokens: { "--bg":"#232634","--surface":"#303446","--surface-2":"#292C3C","--border":"#414559","--border-mid":"#51576D","--divider":"#2B2E3F","--text":"#C6D0F5","--text-2":"#B5BFE2","--text-muted":"#737994","--text-faint":"#565878","--accent":"#8CAAEE","--accent-fg":"#303446","--danger":"#E78284","--danger-bg":"#2D1A1F" },
+  },
+  {
+    id: "catppuccin-latte", name: "Catppuccin Latte", dark: false,
+    tokens: { "--bg":"#EFF1F5","--surface":"#E6E9EF","--surface-2":"#DCE0E8","--border":"#CCD0DA","--border-mid":"#BCC0CC","--divider":"#E6E9EF","--text":"#4C4F69","--text-2":"#5C5F77","--text-muted":"#8C8FA1","--text-faint":"#ACB0BE","--accent":"#1E66F5","--accent-fg":"#EFF1F5","--danger":"#D20F39","--danger-bg":"#F8E8ED" },
+  },
+  {
+    id: "gruvbox-light", name: "Gruvbox Light", dark: false,
+    tokens: { "--bg":"#FBF1C7","--surface":"#F2E5BC","--surface-2":"#EBDBB2","--border":"#D5C4A1","--border-mid":"#BDAE93","--divider":"#EBDBB2","--text":"#3C3836","--text-2":"#504945","--text-muted":"#7C6F64","--text-faint":"#928374","--accent":"#B57614","--accent-fg":"#FBF1C7","--danger":"#CC241D","--danger-bg":"#FCE8E6" },
+  },
+  {
+    id: "tokyo-night", name: "Tokyo Night", dark: true,
+    tokens: { "--bg":"#1A1B26","--surface":"#24283B","--surface-2":"#1F2335","--border":"#292E42","--border-mid":"#3B4261","--divider":"#1F2335","--text":"#C0CAF5","--text-2":"#A9B1D6","--text-muted":"#565F89","--text-faint":"#414868","--accent":"#7AA2F7","--accent-fg":"#1A1B26","--danger":"#F7768E","--danger-bg":"#2D1A22" },
+  },
+  {
+    id: "tokyo-night-storm", name: "Tokyo Night Storm", dark: true,
+    tokens: { "--bg":"#1F2335","--surface":"#24283B","--surface-2":"#1A1E2E","--border":"#292E42","--border-mid":"#3B4261","--divider":"#1E2233","--text":"#C0CAF5","--text-2":"#A9B1D6","--text-muted":"#565F89","--text-faint":"#414868","--accent":"#BB9AF7","--accent-fg":"#1F2335","--danger":"#F7768E","--danger-bg":"#2D1A22" },
+  },
+  {
+    id: "dracula", name: "Dracula", dark: true,
+    tokens: { "--bg":"#21222C","--surface":"#282A36","--surface-2":"#1E1F29","--border":"#44475A","--border-mid":"#6272A4","--divider":"#2D2F3E","--text":"#F8F8F2","--text-2":"#E0DEF4","--text-muted":"#6272A4","--text-faint":"#44475A","--accent":"#BD93F9","--accent-fg":"#282A36","--danger":"#FF5555","--danger-bg":"#2D1010" },
+  },
+  {
+    id: "one-dark", name: "One Dark", dark: true,
+    tokens: { "--bg":"#21252B","--surface":"#282C34","--surface-2":"#23272E","--border":"#3E4451","--border-mid":"#4B5263","--divider":"#2C313A","--text":"#ABB2BF","--text-2":"#9DA5B4","--text-muted":"#5C6370","--text-faint":"#4B5263","--accent":"#61AFEF","--accent-fg":"#282C34","--danger":"#E06C75","--danger-bg":"#2D1010" },
+  },
+  {
+    id: "github-light", name: "GitHub Light", dark: false,
+    tokens: { "--bg":"#F6F8FA","--surface":"#FFFFFF","--surface-2":"#F0F2F4","--border":"#D0D7DE","--border-mid":"#BBC0C6","--divider":"#E8EAED","--text":"#1F2328","--text-2":"#24292F","--text-muted":"#656D76","--text-faint":"#8C959F","--accent":"#0969DA","--accent-fg":"#FFFFFF","--danger":"#CF222E","--danger-bg":"#FFF0EE" },
+  },
+  {
+    id: "github-dark", name: "GitHub Dark", dark: true,
+    tokens: { "--bg":"#0D1117","--surface":"#161B22","--surface-2":"#0D1117","--border":"#30363D","--border-mid":"#3D444D","--divider":"#21262D","--text":"#E6EDF3","--text-2":"#C9D1D9","--text-muted":"#8B949E","--text-faint":"#484F58","--accent":"#58A6FF","--accent-fg":"#0D1117","--danger":"#F85149","--danger-bg":"#2D1010" },
+  },
+  {
+    id: "rose-pine", name: "Rosé Pine", dark: true,
+    tokens: { "--bg":"#191724","--surface":"#1F1D2E","--surface-2":"#1B1929","--border":"#26233A","--border-mid":"#403D52","--divider":"#21202E","--text":"#E0DEF4","--text-2":"#C5C0D8","--text-muted":"#6E6A86","--text-faint":"#524F67","--accent":"#C4A7E7","--accent-fg":"#1F1D2E","--danger":"#EB6F92","--danger-bg":"#2D1020" },
+  },
+  {
+    id: "rose-pine-dawn", name: "Rosé Pine Dawn", dark: false,
+    tokens: { "--bg":"#FAF4ED","--surface":"#FFFAF3","--surface-2":"#F2E9E1","--border":"#DFDAD9","--border-mid":"#CECACD","--divider":"#F0EBE4","--text":"#575279","--text-2":"#797593","--text-muted":"#9893A5","--text-faint":"#B4B0C0","--accent":"#907AA9","--accent-fg":"#FFFAF3","--danger":"#B4637A","--danger-bg":"#FCE8EC" },
+  },
+  {
+    id: "kanagawa", name: "Kanagawa", dark: true,
+    tokens: { "--bg":"#1F1F28","--surface":"#2A2A37","--surface-2":"#252530","--border":"#363646","--border-mid":"#494958","--divider":"#282831","--text":"#DCD7BA","--text-2":"#C8C093","--text-muted":"#727169","--text-faint":"#54546D","--accent":"#7E9CD8","--accent-fg":"#1F1F28","--danger":"#C34043","--danger-bg":"#2D1010" },
+  },
+  {
+    id: "everforest-dark", name: "Everforest Dark", dark: true,
+    tokens: { "--bg":"#272E33","--surface":"#2D353B","--surface-2":"#272D32","--border":"#3D484D","--border-mid":"#475258","--divider":"#2C3338","--text":"#D3C6AA","--text-2":"#C0B89A","--text-muted":"#7A8478","--text-faint":"#545D5A","--accent":"#A7C080","--accent-fg":"#2D353B","--danger":"#E67E80","--danger-bg":"#2D1A1A" },
+  },
+  {
+    id: "everforest-light", name: "Everforest Light", dark: false,
+    tokens: { "--bg":"#FDF6E3","--surface":"#F4F0D9","--surface-2":"#EAE4CA","--border":"#E0DBC4","--border-mid":"#CEC9B4","--divider":"#F0EADA","--text":"#5C6A72","--text-2":"#6D7F86","--text-muted":"#829181","--text-faint":"#9DA9A0","--accent":"#8DA101","--accent-fg":"#FDF6E3","--danger":"#F85552","--danger-bg":"#FCE8E8" },
+  },
+  {
+    id: "night-owl", name: "Night Owl", dark: true,
+    tokens: { "--bg":"#011627","--surface":"#01121F","--surface-2":"#011020","--border":"#1D3B53","--border-mid":"#2D5170","--divider":"#01192E","--text":"#D6DEEB","--text-2":"#C5CEE0","--text-muted":"#4B6479","--text-faint":"#2D4057","--accent":"#82AAFF","--accent-fg":"#011627","--danger":"#EF5350","--danger-bg":"#1A0505" },
+  },
+  {
+    id: "ayu-dark", name: "Ayu Dark", dark: true,
+    tokens: { "--bg":"#0B0E14","--surface":"#0D1017","--surface-2":"#0A0D12","--border":"#1A1F29","--border-mid":"#272D38","--divider":"#131720","--text":"#BFBDB6","--text-2":"#A8A09E","--text-muted":"#636363","--text-faint":"#3D3D3D","--accent":"#FFB454","--accent-fg":"#0B0E14","--danger":"#F07178","--danger-bg":"#1F0A0B" },
+  },
+  {
+    id: "ayu-mirage", name: "Ayu Mirage", dark: true,
+    tokens: { "--bg":"#1F2430","--surface":"#242936","--surface-2":"#1C2128","--border":"#2D3440","--border-mid":"#3E4B59","--divider":"#232A37","--text":"#CCCAC2","--text-2":"#B8BDB5","--text-muted":"#5C6773","--text-faint":"#414A55","--accent":"#FFB454","--accent-fg":"#1F2430","--danger":"#F07178","--danger-bg":"#2D1010" },
+  },
+  {
+    id: "ayu-light", name: "Ayu Light", dark: false,
+    tokens: { "--bg":"#FAFAFA","--surface":"#F8F9FA","--surface-2":"#F0F1F3","--border":"#E0E1E4","--border-mid":"#CFD0D3","--divider":"#F0F0F0","--text":"#575F66","--text-2":"#6C7680","--text-muted":"#8A9199","--text-faint":"#A8B0B8","--accent":"#F5A623","--accent-fg":"#FFFFFF","--danger":"#F07178","--danger-bg":"#FFF0F0" },
+  },
+  {
+    id: "palenight", name: "Palenight", dark: true,
+    tokens: { "--bg":"#252837","--surface":"#292D3E","--surface-2":"#23263A","--border":"#3D4062","--border-mid":"#4F5379","--divider":"#2A2D3E","--text":"#A6ACCD","--text-2":"#959CB6","--text-muted":"#676E95","--text-faint":"#4E536A","--accent":"#C792EA","--accent-fg":"#292D3E","--danger":"#F07178","--danger-bg":"#2D1010" },
+  },
+  {
+    id: "paper", name: "Paper", dark: false,
+    tokens: { "--bg":"#F5F0E8","--surface":"#FAF6F0","--surface-2":"#EDE8DF","--border":"#D8D0C4","--border-mid":"#C8BDB0","--divider":"#E8E2D8","--text":"#2C2414","--text-2":"#4A3F30","--text-muted":"#7A6F60","--text-faint":"#A89F90","--accent":"#6B4C2A","--accent-fg":"#FAF6F0","--danger":"#B02020","--danger-bg":"#F9E8E8" },
+  },
 ];
 
 let activeTheme = null;  // null = default (dark mode toggle controls appearance)
