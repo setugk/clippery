@@ -98,7 +98,9 @@
          "A full year of writing here. Some entries are one line, some are pages. Both count.\n\nGoal for next year: show up more than I skip.",
          journal.id, ["daily-journal"], "2025-12-31T23:00:00.000Z"),
     ];
-    return { folders: [journal, ideas], notes, settings: {} };
+    // Pin #getting-started so the tutorial is front-and-centre in the sidebar.
+    // Stored the same way the app persists pins: a JSON string under pinnedTags.
+    return { folders: [journal, ideas], notes, settings: { pinnedTags: JSON.stringify(["getting-started"]) } };
   }
 
   function load() {
