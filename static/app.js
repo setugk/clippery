@@ -15,10 +15,12 @@ const state = {
   expandedFolders: new Set(JSON.parse(localStorage.getItem("expandedFolders") || "[]")),
   darkMode: localStorage.getItem("darkMode") === "true",
   subfoldersExpanded: localStorage.getItem("subfoldersExpanded") !== "false",
-  // Sidebar section collapse states
-  timelineExpanded:   localStorage.getItem("timelineExpanded")   !== "false",
+  // Sidebar section collapse states.
+  // Only Pinned defaults to expanded; Tags and Timeline default to collapsed
+  // (=== "true" means collapsed unless the user has explicitly expanded them).
+  timelineExpanded:   localStorage.getItem("timelineExpanded")   === "true",
   pinnedTagsExpanded: localStorage.getItem("pinnedTagsExpanded") !== "false",
-  allTagsExpanded:    localStorage.getItem("allTagsExpanded")    !== "false",
+  allTagsExpanded:    localStorage.getItem("allTagsExpanded")    === "true",
   // Pinned tags (ordered array of tag names)
   pinnedTags: JSON.parse(localStorage.getItem("pinnedTags") || "[]"),
   // Folder visibility
