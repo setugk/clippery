@@ -8,14 +8,17 @@ import db
 app = Flask(__name__)
 db.init_db()
 
-CLIPPERY_USER   = os.environ.get("CLIPPERY_USER")
-CLIPPERY_PASS   = os.environ.get("CLIPPERY_PASS")
+# Optional basic auth. Set JOURNERY_USER + JOURNERY_PASS to require a login;
+# leave unset to run open (e.g. behind Cloudflare Access). CLIPPERY_* still work
+# as legacy fallbacks.
+CLIPPERY_USER   = os.environ.get("JOURNERY_USER") or os.environ.get("CLIPPERY_USER")
+CLIPPERY_PASS   = os.environ.get("JOURNERY_PASS") or os.environ.get("CLIPPERY_PASS")
 JOURNERY_NAME   = os.environ.get("JOURNERY_NAME", "")
 # Demo mode: the browser stores all data locally (see static/demo.js); the server
 # DB is unused. Set DEMO_MODE=1 on the public demo instance only.
 DEMO_MODE       = os.environ.get("DEMO_MODE") == "1"
 STATIC_VERSION  = str(int(time.time()))
-APP_VERSION     = "1.10.1"
+APP_VERSION     = "1.10.2"
 
 
 def requires_auth(f):

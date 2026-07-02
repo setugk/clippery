@@ -1,11 +1,16 @@
+# Journery — self-hosted. Your notes live entirely in the volume below; nothing
+# is sent anywhere. Run `docker compose up -d`, then open http://localhost:5050
 services:
-  clipboard:
-    image: journery:latest
-    container_name: clipboard
+  journery:
+    image: ghcr.io/setugk/journery:latest
+    container_name: journery
     restart: unless-stopped
     ports:
-      - "5050:5000"
+      - "5050:5000"        # open http://localhost:5050 (change 5050 to any free port)
     volumes:
-      - ./data:/data
-    environment:
-      - JOURNERY_NAME=Setu
+      - ./data:/data       # YOUR DATA lives here. Point the left side anywhere:
+                           #   /mnt/nas/journery:/data, a named volume, etc.
+    # environment:
+    #   # Optional: require a login. Leave both unset to run with no password.
+    #   - JOURNERY_USER=me
+    #   - JOURNERY_PASS=change-this

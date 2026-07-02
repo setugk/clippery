@@ -18,30 +18,55 @@ A self-hosted private journaling app. Nestable folders, tagged notes, markdown-s
 - Real-time sync polling across tabs/devices
 - 3-pane layout on desktop; drill-down navigation on mobile
 
+## Try it first
+
+Kick the tyres at **[demo-journery.setugk.com](https://demo-journery.setugk.com)** — a full demo where everything is saved only in your browser (nothing shared, nothing stored on a server). When you're ready, host your own below.
+
 ## Getting started
 
-You'll need [Docker](https://docs.docker.com/get-docker/) installed. That's the only dependency.
+You own your data — it lives in a folder you choose, on hardware you control. The only dependency is [Docker](https://docs.docker.com/get-docker/).
 
-**1. Clone the repo**
+### Quickest — one command
+
 ```bash
-git clone https://github.com/setugk/journery.git
-cd journery
+docker run -d --name journery -p 5050:5000 -v ~/journery-data:/data ghcr.io/setugk/journery
 ```
 
-**2. Start it**
+Then open **http://localhost:5050**. No cloning, no build — your notes are stored in `~/journery-data`.
+
+### Or with Docker Compose
+
 ```bash
+curl -O https://raw.githubusercontent.com/setugk/journery/main/docker-compose.yml
 docker compose up -d
 ```
 
-**3. Open it**
+Open **http://localhost:5050**. Data lives in `./data`.
 
-Go to `http://localhost:5050` in your browser.
+### Where's my data?
 
----
+Everything is a single SQLite file inside the volume you mounted (`~/journery-data` or `./data` above). **Point that at anywhere you like** — a folder on your NAS, an external drive, a named Docker volume:
 
-**Want to access it from anywhere — not just your home network?**
+```bash
+-v /mnt/nas/journery:/data      # store it on your NAS
+-v journery-data:/data          # a managed Docker volume
+```
 
-Put it behind a [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/). It's free, takes about 10 minutes to set up, and gives you a public URL like `journery.yourdomain.com` that works from any device, anywhere. Add a Cloudflare Access policy (email OTP) for auth — no app-level login needed.
+Back it up by copying that folder. Nothing ever leaves your machine.
+
+### Add a password (optional)
+
+By default Journery runs with no login (handy on a private network). To require one, set two env vars:
+
+```bash
+docker run -d -p 5050:5000 -v ~/journery-data:/data \
+  -e JOURNERY_USER=me -e JOURNERY_PASS=change-this \
+  ghcr.io/setugk/journery
+```
+
+### Access it from anywhere
+
+Put it behind a free [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (~10 min) for a public URL like `journery.yourdomain.com` that works from any device. Add a Cloudflare Access policy (email OTP) for auth — no app-level login needed.
 
 ## Stack
 
