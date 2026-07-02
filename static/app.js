@@ -589,22 +589,28 @@ function renderAllTags() {
   const chev = $("all-tags-chev");
   const list = $("all-tags-list");
   const countEl = $("all-tags-count");
-  const unpinned = state.tags.filter(t => !state.pinnedTags.includes(t.name));
-  if (countEl) countEl.textContent = unpinned.length || "";
+  // Tags is the full index of every tag; the Pinned section above is just a
+  // filtered shortcut. So list all tags here — pinned ones appear in both,
+  // each showing the correct pin/unpin control.
+  if (countEl) countEl.textContent = state.tags.length || "";
   if (chev) chev.classList.toggle("open", state.allTagsExpanded);
   list.innerHTML = "";
   const section = $("all-tags-section");
   if (section) section.style.display = !state.tags.length ? "none" : "";
-  if (!state.allTagsExpanded || !unpinned.length) return;
-  unpinned.forEach(tag => {
+  if (!state.allTagsExpanded || !state.tags.length) return;
+  state.tags.forEach(tag => {
+    const isPinned = state.pinnedTags.includes(tag.name);
     const isActive = state.context.type === "tag" && state.context.id === tag.name;
     const btn = document.createElement("button");
     btn.className = "tag-nav-item" + (isActive ? " active" : "");
-    btn.innerHTML = `<span class="tag-hash">#</span>${esc(tag.name)}<span class="tag-right"><button class="tag-pin-btn" title="Pin">${PIN_OUTLINE_SVG}</button><span class="tag-count">${tag.count}</span></span>`;
+    const pinBtn = isPinned
+      ? `<button class="tag-pin-btn pinned" title="Unpin">${PIN_SVG}</button>`
+      : `<button class="tag-pin-btn" title="Pin">${PIN_OUTLINE_SVG}</button>`;
+    btn.innerHTML = `<span class="tag-hash">#</span>${esc(tag.name)}<span class="tag-right">${pinBtn}<span class="tag-count">${tag.count}</span></span>`;
     btn.addEventListener("click", () => navigateToTag(tag.name));
     btn.querySelector(".tag-pin-btn").addEventListener("click", e => {
       e.stopPropagation();
-      pinTag(tag.name);
+      isPinned ? unpinTag(tag.name) : pinTag(tag.name);
     });
     list.appendChild(btn);
   });
