@@ -11,6 +11,7 @@ const state = {
   paneSearchQuery: "",
   sortBy: localStorage.getItem("sortBy") || "created_desc",
   dateDisplay: localStorage.getItem("dateDisplay") || "created",
+  recentsRange: localStorage.getItem("recentsRange") || "week",
   expandedFolders: new Set(JSON.parse(localStorage.getItem("expandedFolders") || "[]")),
   darkMode: localStorage.getItem("darkMode") === "true",
   subfoldersExpanded: localStorage.getItem("subfoldersExpanded") !== "false",
@@ -83,6 +84,14 @@ function applyDark(dark) {
     : document.documentElement.removeAttribute("data-dark");
   localStorage.setItem("darkMode", dark);
   state.darkMode = dark;
+  syncThemeColorMeta();
+}
+
+// Keeps the browser-chrome theme-color in sync with whatever --bg actually
+// resolves to right now — plain dark mode or one of the many custom themes.
+function syncThemeColorMeta() {
+  const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+  if (bg) $("theme-color-meta").setAttribute("content", bg);
 }
 
 // ── Theme system ──────────────────────────────────────────────────────────────
@@ -304,6 +313,12 @@ function updateDatePicker() {
   });
 }
 
+function updateRecentsRangePicker() {
+  $("recents-range-picker").querySelectorAll("button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.value === state.recentsRange);
+  });
+}
+
 const SETTINGS_SECTION_LABELS = {
   general: "General", sidebar: "Sidebar", tags: "Tags", themes: "Themes", data: "Data",
 };
@@ -338,6 +353,7 @@ function openSettings() {
   $("settings-dark-toggle").classList.toggle("on", state.darkMode);
   $("settings-folders-toggle").classList.toggle("on", state.showFolders);
   updateDatePicker();
+  updateRecentsRangePicker();
   $("settings-view").dataset.pane = "list";
   $("settings-topbar-back").querySelector("span").textContent = "Back";
   $("settings-topbar-title").textContent = "Settings";
@@ -380,6 +396,16 @@ $("date-display-picker").addEventListener("click", e => {
   state.dateDisplay = btn.dataset.value;
   localStorage.setItem("dateDisplay", state.dateDisplay);
   updateDatePicker();
+  renderNotesList();
+});
+
+$("recents-range-picker").addEventListener("click", e => {
+  const btn = e.target.closest("[data-value]");
+  if (!btn) return;
+  state.recentsRange = btn.dataset.value;
+  localStorage.setItem("recentsRange", state.recentsRange);
+  updateRecentsRangePicker();
+  if (state.context.type === "recents") paneTitle.textContent = recentsPaneTitle();
   renderNotesList();
 });
 
@@ -624,6 +650,14 @@ function setMobileView(view) {
   appEl.dataset.view = view;
   if (window.innerWidth <= 768 && view !== 'editor') {
     noteBody.blur();
+    // blur() alone doesn't collapse the text selection — window.getSelection()
+    // is document-level, not tied to focus. Without clearing it too, the
+    // selectionchange listener still sees a live selection inside noteBody
+    // moments later and calls showFormatBar() again, undoing hideFormatBar()
+    // and leaving the docked bar stranded over the notes list.
+    const sel = window.getSelection();
+    if (sel) sel.removeAllRanges();
+    hideFormatBar();
   }
 }
 
@@ -669,7 +703,10 @@ appEl.addEventListener("touchend", e => {
   if (dx > 60 && dy < 80) {
     if (state.mobileView === "editor") {
       saveNoteNow();
+      state.note = null;
       setMobileView("notes");
+      renderNotesList();
+      showEditorEmpty();
     } else if (state.mobileView === "notes") {
       setMobileView("sidebar");
     }
@@ -690,6 +727,7 @@ function runSearch() {
   setActiveNav(null);
   renderSidebar();
   setMobileView("notes");
+  notesList.scrollTop = 0;
   loadNotes().then(() => {
     const n = state.notes.length;
     paneTitle.textContent = `${n} result${n === 1 ? "" : "s"}`;
@@ -705,6 +743,7 @@ function clearSearch() {
   setActiveNav(navAllNotes);
   renderSidebar();
   loadNotes();
+  notesList.scrollTop = 0;
 }
 
 searchInput.addEventListener("input", updateSearchClear);
@@ -855,6 +894,7 @@ function navigateToFolder(folder, pushHistory = false) {
   renderSidebar();
   loadNotes();
   setMobileView("notes");
+  notesList.scrollTop = 0;
 }
 
 function navigateToTag(tagName) {
@@ -865,6 +905,7 @@ function navigateToTag(tagName) {
   renderSidebar();
   loadNotes();
   setMobileView("notes");
+  notesList.scrollTop = 0;
 }
 
 function navigateToYear(year) {
@@ -875,6 +916,7 @@ function navigateToYear(year) {
   renderSidebar();
   loadNotes();
   setMobileView("notes");
+  notesList.scrollTop = 0;
 }
 
 function navigateToTrash() {
@@ -887,6 +929,7 @@ function navigateToTrash() {
   renderSidebar();
   loadNotes();
   setMobileView("notes");
+  notesList.scrollTop = 0;
 }
 
 navAllNotes.addEventListener("click", () => {
@@ -900,7 +943,13 @@ navAllNotes.addEventListener("click", () => {
   renderSidebar();
   loadNotes();
   setMobileView("notes");
+  notesList.scrollTop = 0;
 });
+
+const RECENTS_RANGE_LABEL = { day: "Past day", week: "Past week", month: "Past month" };
+function recentsPaneTitle() {
+  return `Recents · ${RECENTS_RANGE_LABEL[state.recentsRange] || RECENTS_RANGE_LABEL.week}`;
+}
 
 navRecents.addEventListener("click", () => {
   state.navHistory = [];
@@ -908,11 +957,12 @@ navRecents.addEventListener("click", () => {
   state.searchQuery = "";
   searchInput.value = "";
   updateSearchClear();
-  paneTitle.textContent = "Recents";
+  paneTitle.textContent = recentsPaneTitle();
   setActiveNav(navRecents);
   renderSidebar();
   loadNotes();
   setMobileView("notes");
+  notesList.scrollTop = 0;
 });
 
 $("nav-trash").addEventListener("click", navigateToTrash);
@@ -996,10 +1046,15 @@ async function loadNotes() {
 
 // ── Sort ──────────────────────────────────────────────────────────────────────
 
+const RECENTS_RANGE_MS = { day: 86400000, week: 7 * 86400000, month: 30 * 86400000 };
+
 function sortedNotes() {
   const notes = [...state.notes];
   if (state.context.type === "recents") {
-    return notes.sort((a,b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 20);
+    const cutoff = Date.now() - (RECENTS_RANGE_MS[state.recentsRange] || RECENTS_RANGE_MS.week);
+    return notes
+      .filter(n => new Date(n.updated_at).getTime() >= cutoff)
+      .sort((a,b) => b.updated_at.localeCompare(a.updated_at));
   }
   switch (state.sortBy) {
     case "updated_asc":  return notes.sort((a,b) => a.updated_at.localeCompare(b.updated_at));
@@ -1340,6 +1395,7 @@ function openNote(note) {
     noteBody.innerHTML = bodyToHtml(note.body || "");
     bodyPlaceholder.classList.toggle("hidden", (note.body || "").trim().length > 0);
     setMobileView("editor");
+    autosizeTitle();
     if (!isMobile() && !inTrash) {
       noteBody.focus();
       const sel = window.getSelection();
@@ -1379,10 +1435,17 @@ function removeTag(tagName) {
 }
 
 const tagSuggestionsEl = $("tag-suggestions");
+let tagSuggestionIndex = -1;
 
 function hideSuggestions() {
   tagSuggestionsEl.classList.add("hidden");
   tagSuggestionsEl.innerHTML = "";
+  tagSuggestionIndex = -1;
+}
+
+function highlightTagSuggestion(items) {
+  items.forEach((btn, i) => btn.classList.toggle("active", i === tagSuggestionIndex));
+  if (tagSuggestionIndex >= 0) items[tagSuggestionIndex].scrollIntoView({ block: "nearest" });
 }
 
 function addTag(val) {
@@ -1396,6 +1459,7 @@ function addTag(val) {
 }
 
 tagInput.addEventListener("input", () => {
+  tagSuggestionIndex = -1;
   const val = tagInput.value.trim().toLowerCase();
   if (!val) { hideSuggestions(); return; }
 
@@ -1412,19 +1476,39 @@ tagInput.addEventListener("input", () => {
   ).join("");
   tagSuggestionsEl.classList.remove("hidden");
 
-  tagSuggestionsEl.querySelectorAll(".tag-suggestion-item").forEach(btn => {
+  tagSuggestionsEl.querySelectorAll(".tag-suggestion-item").forEach((btn, i) => {
     btn.addEventListener("mousedown", e => {
       e.preventDefault();
       addTag(btn.dataset.tag);
+    });
+    btn.addEventListener("mouseenter", () => {
+      tagSuggestionIndex = i;
+      highlightTagSuggestion([...tagSuggestionsEl.querySelectorAll(".tag-suggestion-item")]);
     });
   });
 });
 
 tagInput.addEventListener("keydown", e => {
+  const items = [...tagSuggestionsEl.querySelectorAll(".tag-suggestion-item")];
+
+  if (items.length && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+    e.preventDefault();
+    tagSuggestionIndex = e.key === "ArrowDown"
+      ? (tagSuggestionIndex + 1) % items.length
+      : (tagSuggestionIndex - 1 + items.length) % items.length;
+    highlightTagSuggestion(items);
+    return;
+  }
+
   if (e.key === "Enter" || e.key === ",") {
     e.preventDefault();
-    const val = tagInput.value.replace(/,/g, "").trim().toLowerCase();
-    addTag(val);
+    if (items.length && tagSuggestionIndex >= 0) {
+      addTag(items[tagSuggestionIndex].dataset.tag);
+    } else {
+      const val = tagInput.value.replace(/,/g, "").trim().toLowerCase();
+      addTag(val);
+    }
+    return;
   }
   if (e.key === "Escape") { hideSuggestions(); tagInput.value = ""; }
   if (e.key === "Backspace" && !tagInput.value) {
@@ -1515,10 +1599,15 @@ async function saveNoteNow() {
   state.saving = false;
 }
 
-noteTitle.addEventListener("input", scheduleSave);
+function autosizeTitle() {
+  noteTitle.style.height = "auto";
+  noteTitle.style.height = noteTitle.scrollHeight + "px";
+}
+noteTitle.addEventListener("input", () => { autosizeTitle(); scheduleSave(); });
 noteTitle.addEventListener("keydown", e => {
   if (e.key === "Enter") { e.preventDefault(); noteBody.focus(); }
 });
+window.addEventListener("resize", () => { if (state.note) autosizeTitle(); });
 function mdActiveBlock() {
   const sel = window.getSelection();
   if (!sel || !sel.rangeCount) return null;
@@ -1636,7 +1725,7 @@ noteBody.addEventListener("keydown", e => {
       if (k === "i") { e.preventDefault(); applyFormat("italic"); return; }
       if (k === "u") { e.preventDefault(); applyFormat("underline"); return; }
     }
-    if (e.shiftKey && k === "s") { e.preventDefault(); applyFormat("strike"); return; }
+    if (e.shiftKey && k === "x") { e.preventDefault(); applyFormat("strike"); return; }
     if (e.shiftKey && k === "c") { e.preventDefault(); applyFormat("code"); return; }
   }
 
@@ -1648,7 +1737,10 @@ noteBody.addEventListener("keydown", e => {
 
 // ── Floating format bar ───────────────────────────────────────────────────────
 
-function hideFormatBar() { formatBar.classList.add("hidden"); }
+function hideFormatBar() {
+  formatBar.classList.add("hidden");
+  clearTimeout(dockPositionTimer);
+}
 
 function selectionInEditor() {
   const sel = window.getSelection();
@@ -1656,8 +1748,44 @@ function selectionInEditor() {
     noteBody.contains(sel.getRangeAt(0).commonAncestorContainer);
 }
 
+// On touch devices iOS draws its own Cut/Copy/Paste callout right over the
+// selection — floating our bar there just stacks two menus on top of each
+// other. Instead dock it as a full-width bar pinned above the keyboard,
+// like a native input accessory view, so the two never overlap.
+const isTouch = matchMedia("(hover: none)").matches;
+
+// Whenever there's an active selection with the keyboard up, iOS also docks
+// its own selection-adjustment accessory bar (up/down arrows + checkmark)
+// right above the keyboard — the same spot we want. Its height isn't
+// reported through visualViewport, and it can attach a moment after the
+// keyboard's own resize event, so a single measurement right when the
+// keyboard starts animating in is unreliable — it can land above or below
+// the accessory bar, or (if we pad for a guessed accessory height that
+// isn't actually there) leave a dead empty gap. Re-measure shortly after
+// once everything has settled instead of guessing a fixed offset.
+let dockPositionTimer = null;
+
+function positionDockedBar() {
+  const vv = window.visualViewport;
+  const keyboardHeight = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
+  formatBar.style.bottom = keyboardHeight + "px";
+}
+
+function scheduleDockedBarPosition() {
+  positionDockedBar();
+  clearTimeout(dockPositionTimer);
+  dockPositionTimer = setTimeout(positionDockedBar, 150);
+}
+
 function showFormatBar() {
   if (!state.note || !selectionInEditor()) { hideFormatBar(); return; }
+
+  if (isTouch) {
+    formatBar.classList.remove("hidden");
+    formatBar.classList.add("docked");
+    scheduleDockedBarPosition();
+    return;
+  }
 
   const sel  = window.getSelection();
   const rect = sel.getRangeAt(0).getBoundingClientRect();
@@ -1683,14 +1811,27 @@ function showFormatBar() {
   formatBar.classList.toggle("below", below);
 }
 
-noteBody.addEventListener("mouseup", () => requestAnimationFrame(showFormatBar));
+if (isTouch && window.visualViewport) {
+  window.visualViewport.addEventListener("resize", () => {
+    if (!formatBar.classList.contains("hidden")) scheduleDockedBarPosition();
+  });
+  window.visualViewport.addEventListener("scroll", () => {
+    if (!formatBar.classList.contains("hidden")) scheduleDockedBarPosition();
+  });
+}
+
+noteBody.addEventListener("mouseup",  () => requestAnimationFrame(showFormatBar));
+noteBody.addEventListener("touchend", () => requestAnimationFrame(showFormatBar));
 noteBody.addEventListener("keyup",   () => selectionInEditor() ? requestAnimationFrame(showFormatBar) : hideFormatBar());
 noteBody.addEventListener("blur", () => {
   setTimeout(() => { if (!formatBar.contains(document.activeElement)) hideFormatBar(); }, 180);
 });
 document.addEventListener("selectionchange", () => {
   const sel = window.getSelection();
-  if (!sel || sel.isCollapsed) hideFormatBar();
+  if (!sel || sel.isCollapsed) { hideFormatBar(); return; }
+  // Drag-selecting via the iOS selection handles only fires selectionchange,
+  // not mouseup/touchend, so this is what keeps the bar tracking the selection.
+  if (selectionInEditor()) requestAnimationFrame(showFormatBar);
 });
 
 function applyFormat(fmt) {
@@ -1733,6 +1874,14 @@ formatBar.addEventListener("mousedown", e => {
   e.preventDefault();
   applyFormat(btn.dataset.fmt);
 });
+// touchstart (not click) so preventDefault fires before iOS collapses the
+// selection for touching outside the editor.
+formatBar.addEventListener("touchstart", e => {
+  const btn = e.target.closest("[data-fmt]");
+  if (!btn) return;
+  e.preventDefault();
+  applyFormat(btn.dataset.fmt);
+}, { passive: false });
 
 // ── Copy note ─────────────────────────────────────────────────────────────────
 
@@ -1748,8 +1897,11 @@ $("copy-note-btn").addEventListener("click", () => {
 
 $("editor-save-btn").addEventListener("click", async () => {
   await saveNoteNow();
+  // "Save and go back" — same as the back button, the note shouldn't stay
+  // marked active in the list once we've left the editor.
+  state.note = null;
   setMobileView("notes");
-  if (!state.note) showEditorEmpty();
+  showEditorEmpty();
   await loadNotes();
   state.tags = await api("GET", "/api/tags");
   renderSidebar();
@@ -1771,10 +1923,16 @@ async function newNote() {
   setAutosave("");
   showEditorBody();
   renderNotesList();
-  requestAnimationFrame(() => {
-    setMobileView("editor");
-    if (!isMobile()) noteTitle.focus();
-  });
+  setMobileView("editor");
+  autosizeTitle();
+  // Must run synchronously in the same tick as the triggering tap/click —
+  // iOS Safari refuses to raise the on-screen keyboard for a focus() call
+  // made from inside requestAnimationFrame/setTimeout/a promise callback.
+  // preventScroll stops Safari's own "scroll focused element into view" —
+  // at this instant .editor-pane is still mid-transform off to the right,
+  // so without it Safari's auto-scroll and our slide-in transition both
+  // animate the pane into place, showing as two slides back to back.
+  noteTitle.focus({ preventScroll: true });
 }
 
 // ── Trash helpers ─────────────────────────────────────────────────────────────

@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="{% if journery_name %}{{ journery_name }}{% else %}Journery{% endif %}">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#F5F5F5" id="theme-color-meta">
 <link rel="manifest" href="/manifest.json">
 <title>{% if journery_name %}Journery | {{ journery_name }}{% else %}Journery{% endif %}</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><text x='16' y='23' text-anchor='middle' font-family='-apple-system,sans-serif' font-weight='600' font-size='19' fill='white'>J</text></svg>">
@@ -198,7 +198,7 @@
           <button class="trash-banner-delete" id="trash-perm-delete-editor-btn">Delete permanently</button>
         </div>
       </div>
-      <input type="text" class="note-title-input" id="note-title" placeholder="Title" autocomplete="off" spellcheck="true">
+      <textarea class="note-title-input" id="note-title" placeholder="Title" autocomplete="off" spellcheck="true" rows="1"></textarea>
       <div class="note-tags-row">
         <div class="tags-chips" id="tags-chips"></div>
         <input type="text" class="tag-input" id="tag-input" placeholder="+ add tag" autocomplete="off">
@@ -280,9 +280,20 @@
                   <div class="settings-row-label">List date</div>
                   <div class="settings-row-desc">Which date shows on each note</div>
                 </div>
-                <div class="date-display-picker" id="date-display-picker">
+                <div class="segmented-picker" id="date-display-picker">
                   <button data-value="created">Created</button>
                   <button data-value="updated">Last edited</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Recents range</div>
+                  <div class="settings-row-desc">How far back "Recents" looks</div>
+                </div>
+                <div class="segmented-picker" id="recents-range-picker">
+                  <button data-value="day">Day</button>
+                  <button data-value="week">Week</button>
+                  <button data-value="month">Month</button>
                 </div>
               </div>
             </div>
@@ -405,7 +416,7 @@
   <button class="fmt-btn" data-fmt="underline" title="Underline (⌘U)">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" y1="20" x2="20" y2="20"/></svg>
   </button>
-  <button class="fmt-btn" data-fmt="strike" title="Strikethrough (⌘⇧S)">
+  <button class="fmt-btn" data-fmt="strike" title="Strikethrough (⌘⇧X)">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" y1="12" x2="20" y2="12"/></svg>
   </button>
   <div class="fmt-sep"></div>

@@ -12,7 +12,7 @@ CLIPPERY_USER   = os.environ.get("CLIPPERY_USER")
 CLIPPERY_PASS   = os.environ.get("CLIPPERY_PASS")
 JOURNERY_NAME   = os.environ.get("JOURNERY_NAME", "")
 STATIC_VERSION  = str(int(time.time()))
-APP_VERSION     = "1.8.0"
+APP_VERSION     = "1.9.0"
 
 
 def requires_auth(f):
@@ -245,7 +245,7 @@ def manifest():
         "short_name": short_name,
         "start_url": "/",
         "display": "standalone",
-        "background_color": "#ffffff",
+        "background_color": "#F5F5F5",
         "theme_color": "#111111",
     })
 
