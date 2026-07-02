@@ -68,6 +68,8 @@ let contextMenuNote = null;
 // ── API helpers ───────────────────────────────────────────────────────────────
 
 async function api(method, path, body) {
+  // Demo mode: serve everything from the browser-local store (see demo.js).
+  if (window.DEMO_MODE && window.demoApi) return window.demoApi(method, path, body);
   const opts = { method, headers: {} };
   if (body !== undefined) {
     opts.headers["Content-Type"] = "application/json";

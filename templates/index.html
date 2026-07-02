@@ -19,7 +19,7 @@
   <!-- ── Sidebar ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <span class="app-title">Journery{% if journery_name and journery_name != "Beta" %} | {{ journery_name }}{% endif %}{% if journery_name == "Beta" %}<span class="beta-badge">BETA</span>{% endif %}</span>
+      <span class="app-title">Journery{% if journery_name and journery_name not in ["Beta", "Demo"] %} | {{ journery_name }}{% endif %}{% if journery_name == "Beta" %}<span class="beta-badge">BETA</span>{% endif %}{% if journery_name == "Demo" %}<span class="demo-badge">DEMO</span>{% endif %}</span>
       <div class="sidebar-header-actions">
         <button class="icon-btn" id="compose-btn" title="New note">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
@@ -367,6 +367,19 @@
               </div>
             </div>
           </div>
+          <!-- Demo only: reset to sample data -->
+          <div class="settings-group demo-only">
+            <div class="settings-group-title">Demo</div>
+            <div class="settings-group-rows">
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Reset demo data</div>
+                  <div class="settings-row-desc">Restore the sample notes; clears anything you've added</div>
+                </div>
+                <button class="demo-reset-link" id="demo-reset-btn">Reset</button>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -448,6 +461,8 @@
   <button id="ctx-delete-btn" class="danger">Delete note</button>
 </div>
 
+<script>window.DEMO_MODE = {{ 'true' if demo_mode else 'false' }};</script>
+<script src="/static/demo.js?v={{ static_v }}"></script>
 <script src="/static/app.js?v={{ static_v }}"></script>
 </body>
 </html>

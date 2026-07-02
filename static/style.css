@@ -49,13 +49,23 @@ body {
   touch-action: pan-x pan-y; /* allow scroll/swipe, block double-tap & pinch zoom */
 }
 
-.beta-badge {
+.beta-badge, .demo-badge {
   display: inline-block; margin-left: 6px;
   background: #f59e0b; color: #000;
   font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
   padding: 2px 5px; border-radius: 3px;
   vertical-align: middle; position: relative; top: -1px;
 }
+.demo-badge { background: #10b981; color: #04241a; }
+
+/* Demo-only UI is hidden everywhere except the demo instance (body.demo-mode) */
+.demo-only { display: none; }
+.demo-mode .demo-only { display: block; }
+.demo-reset-link {
+  background: none; border: none; font-family: inherit; font-size: 13px;
+  font-weight: 500; color: var(--danger); cursor: pointer; padding: 4px 2px;
+}
+.demo-reset-link:hover { text-decoration: underline; }
 
 /* ── App shell ─────────────────────────────────────────────────────── */
 
